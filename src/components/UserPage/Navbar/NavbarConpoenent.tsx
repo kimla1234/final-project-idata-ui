@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet";
 import NotificationItem from "./Notification/NotificationItem";
 import { HiOutlineTicket } from "react-icons/hi2";
-import { TicketContent } from "./Sheet/TicketContent";
+
 import { useGetUserQuery } from "@/redux/service/user";
 import { useAppSelector } from "@/redux/hooks";
 import { BellIcon } from "@/components/DashboardCompoenents/Layouts/header/notification/icons";

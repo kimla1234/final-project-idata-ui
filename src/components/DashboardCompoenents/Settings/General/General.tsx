@@ -14,7 +14,7 @@ interface SidebarItemProps {
   onClick: () => void;
   icon?: IconType;
 }
-export function General() {
+export function General({ schema }: { schema: any }) {
   const [activeTab, setActiveTab] = useState("collaborators");
 
   return (
@@ -53,7 +53,7 @@ export function General() {
         <ResizablePanel defaultSize={50}>
           <div className="h-full overflow-y-auto p-8">
             {activeTab === "collaborators" ? (
-              <CollaboratorsView />
+              <CollaboratorsView schema={schema}/>
             ) : (
               <GeneralView />
             )}

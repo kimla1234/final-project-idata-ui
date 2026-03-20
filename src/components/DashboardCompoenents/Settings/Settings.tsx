@@ -15,7 +15,7 @@ import { General } from "./General/General";
 
 
 
-export function Settings() {
+export function Settings({ schema }: { schema: any }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") || "general";
@@ -62,7 +62,7 @@ export function Settings() {
           className="duration-500 animate-in fade-in slide-in-from-bottom-4"
         >
           <div className="h-auto w-full rounded-md bg-white  text-slate-600">
-            <General />
+            <General  schema={schema}/>
           </div>
         </TabsContent>
         <TabsContent

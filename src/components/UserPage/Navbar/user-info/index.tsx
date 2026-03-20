@@ -14,8 +14,7 @@ import { LogOutIcon, SettingsIcon, UserIcon, Ticket, Dashboard } from "./icons";
 import { useRouter } from "next/navigation";
 import { ConfirmModal } from "@/components/DashboardCompoenents/ui/ConfirmModal";
 import NavSheetItem from "../Sheet/NavSheetItem";
-import { ProfileContent } from "../Sheet/ProfileContent";
-import { TicketContent } from "../Sheet/TicketContent";
+
 import SettingContent from "../Sheet/SettingContent";
 import { toast } from "@/hooks/use-toast";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -159,7 +158,7 @@ export function UserInfo({ user: propUser }: UserInfoProps) {
               label="View profile"
               title="Profile Information"
             >
-              <ProfileContent />
+             View profile
             </NavSheetItem>
           </DropdownMenuItem>
 

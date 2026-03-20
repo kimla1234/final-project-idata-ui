@@ -11,7 +11,7 @@ export default function page() {
         <div>Manage your account preferences and configuration</div>
       </div>
 
-      <Settings />
+      <Settings schema={null}/>
     </div>
   );
 }
