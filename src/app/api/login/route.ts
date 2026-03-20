@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Email and password are required" }, { status: 400 });
     }
 
-    const response = await fetch("http://localhost:8081/api/v1/auth/user/login", {
+    const response = await fetch("https://api.idata.fit/api/v1/auth/user/login", {
       method: "POST",
       headers: { "Content-Type": "application/json", Accept: "application/json" },
       body: JSON.stringify({ email, password }),
