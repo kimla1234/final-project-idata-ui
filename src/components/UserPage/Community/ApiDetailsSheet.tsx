@@ -126,7 +126,7 @@ export default function ApiDetailsSheet({
     if (targetData?.spec) return targetData.spec;
 
     // ១. ទាញយក projectKey និង slug ចេញពី endpointUrl ពិតប្រាកដ
-    // ឧទាហរណ៍ URL: http://localhost:8081/api/v1/engine-p-d9eba188/user
+    // ឧទាហរណ៍ URL: https://api.idata.fit/api/v1/engine-p-d9eba188/user
     const endpointUrl = targetData?.endpointUrl || "";
 
     // ប្រើ Regex ដើម្បីចាប់យក engine-xxxx
@@ -168,7 +168,7 @@ export default function ApiDetailsSheet({
         version: "1.0.0",
         description: targetData?.description || "Dynamic API documentation",
       },
-      servers: [{ url: "http://localhost:8081" }],
+      servers: [{ url: "https://api.idata.fit" }],
       components: {
         schemas: {
           Model: {

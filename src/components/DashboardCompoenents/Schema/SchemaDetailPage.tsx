@@ -163,7 +163,7 @@ useEffect(() => {
     const fetchAndFixSwagger = async () => {
       try {
         // 🎯 ១. បាញ់ទៅយក JSON ពី Backend
-        const response = await fetch("http://localhost:8081/v3/api-docs");
+        const response = await fetch("https://api.idata.fit/v3/api-docs");
         if (!response.ok) throw new Error("Failed to fetch API docs");
 
         const data: any = await response.json();
@@ -177,7 +177,7 @@ useEffect(() => {
 
         // 🎯 ៣. កំណត់ Server URL ឱ្យទៅ Port 8081 (Engine Port)
         data.servers = [
-          { url: "http://localhost:8081", description: "API Engine Server" },
+          { url: "https://api.idata.fit", description: "API Engine Server" },
         ];
 
         // 🎯 ៤. ការកំណត់ Security (បិទ/បើក តាមស្ថានភាព Public/Private)
@@ -1513,7 +1513,7 @@ const handleStartAiGeneration = async () => {
                         Base Server URL
                       </span>
                       <code className="text-sm font-bold text-gray-700 dark:text-gray-300">
-                        http://localhost:8081/api/v1/engine-{projectKey}/
+                        https://api.idata.fit/api/v1/engine-{projectKey}/
                         {realSlug}
                       </code>
                     </div>
