@@ -2,6 +2,7 @@
 const nextConfig = {
   devIndicators: false,
   reactStrictMode: false,
+  output: 'standalone',
 experimental: {
   turbopack: {
     root: '.',
