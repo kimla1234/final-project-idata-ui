@@ -14,8 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Image from "next/image";
 import { IoCloseSharp } from "react-icons/io5";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);

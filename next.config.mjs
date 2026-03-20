@@ -2,7 +2,11 @@
 const nextConfig = {
   devIndicators: false,
   reactStrictMode: false,
-
+experimental: {
+  turbopack: {
+    root: '.',
+  },
+},
   transpilePackages: ['react-day-picker','swagger-ui-react', 'swagger-client', 'spec-api'],
   
   // បើនៅតែមិនបាត់ អាចថែមការកំណត់ខាងក្រោមនេះ (Optional)
