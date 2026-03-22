@@ -1,16 +1,16 @@
 "use client";
 
-import { useState, use } from "react"; // បន្ថែម use
+import { useState, use } from "react"; 
 import { useRouter } from "next/navigation";
 import { useDeleteWorkspaceMutation } from "@/redux/service/workspace";
 import { Loader2, ShieldAlert, ArrowLeft, TriangleAlert, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// ១. កែប្រែ Function Signature ដើម្បីទទួល params ពី Props
+
 export default function ConfirmDeletePage({ params }: { params: Promise<{ workspaceId: string }> }) {
   const router = useRouter();
   
-  // ១. ត្រូវប្រើឈ្មោះ workspaceId ឱ្យដូចឈ្មោះ Folder របស់អ្នក
+
   const { workspaceId } = use(params); 
   
   const [password, setPassword] = useState("");
@@ -25,7 +25,7 @@ export default function ConfirmDeletePage({ params }: { params: Promise<{ worksp
     }
 
     try {
-      // បញ្ជូន workspaceId ទៅ API
+
       await deleteWorkspace({ id: Number(workspaceId), password }).unwrap();
       router.push("/dashboard");
     } catch (err: any) {
@@ -104,7 +104,7 @@ export default function ConfirmDeletePage({ params }: { params: Promise<{ worksp
           </form>
         </div>
 
-        {/* Footer Accent */}
+
         <div className="h-1.5 w-full bg-red-600" />
       </div>
     </div>

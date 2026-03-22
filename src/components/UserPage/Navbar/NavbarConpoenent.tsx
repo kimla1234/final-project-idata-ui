@@ -46,7 +46,7 @@ export default function NavbarComponent() {
     { name: "Home", href: "/", icon: <Home size={18} /> },
     { name: "Community", href: "/community", icon: <Users size={18} /> },
     { name: "Learn", href: "/learn", icon: <BookOpen size={18} /> },
-    { name: "Contact us", href: "/contact", icon: <Mail size={18} /> },
+
   ];
 
   return (

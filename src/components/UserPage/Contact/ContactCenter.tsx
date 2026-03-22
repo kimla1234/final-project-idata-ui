@@ -15,7 +15,7 @@ import {
   Phone,
 } from "lucide-react";
 import Image from "next/image";
-import { TicketCard } from "../Navbar/Sheet/TicketCard";
+
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import FAQ from "./faqBooking";
