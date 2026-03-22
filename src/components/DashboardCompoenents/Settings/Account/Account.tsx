@@ -119,9 +119,11 @@ export default function Account() {
       <div className="mb-6 flex items-center space-x-5">
         <div className="relative h-24 w-24 overflow-hidden rounded-full border border-gray-100">
           <Image
-            fill
+            unoptimized
             src={formData.profileImage || "/placeholder.png"}
             alt="Profile"
+            width={1000}
+            height={1000}
             className="object-cover"
           />
           {isUploading && (
