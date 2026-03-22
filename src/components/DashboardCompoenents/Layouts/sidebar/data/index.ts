@@ -17,20 +17,7 @@ export const NAV_DATA = [
         url: "/schema",
         icon: Icons.Schema,
         items: [
-          {
-            title: "Tenants Interview",
-            url: "/schema",
-            icon: Icons.Folders,
-          },
-          {
-            title: "Tenants HR",
-            url: "/tenantsfdd",
-            icon: Icons.Folders,
-          },
-          {
-            title: "Add new folder",
-            url: "/tenantsffdd",
-          },
+         
         ],
       },
 
@@ -51,12 +38,6 @@ export const NAV_DATA = [
         icon: Icons.Setting,
         items: [],
         url: "/setting",
-      },
-      {
-        title: "Help Center",
-        icon: Icons.HelpCenter,
-        items: [],
-        url: "/help_center",
       },
       {
         title: "Sign out",

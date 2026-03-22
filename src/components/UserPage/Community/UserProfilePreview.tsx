@@ -1,11 +1,11 @@
 import Image from "next/image";
 
 
-// បង្កើត Component តូចមួយសម្រាប់បង្ហាញ Profile
+
 export const UserProfilePreview = ({ api }: { api: any }) => {
   return (
     <div className="w-[320px] overflow-hidden rounded-3xl bg-white shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-      {/* 🎯 ប្លង់រូបភាព Cover តូចៗ ៣សន្លឹក ដូច Behance */}
+      
       <div className="grid h-24 grid-cols-3 gap-1 p-1">
         {[1, 2, 3].map((i) => (
           <div key={i} className="relative overflow-hidden bg-gray-100 first:rounded-l-2xl last:rounded-r-2xl">
@@ -19,7 +19,7 @@ export const UserProfilePreview = ({ api }: { api: any }) => {
       </div>
 
       <div className="relative -mt-10 flex flex-col items-center px-5 pb-6 pt-2">
-        {/* Avatar ជាមួយ Border ក្រាស់ស្អាត */}
+
         <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-white bg-white shadow-lg">
           <Image
             unoptimized

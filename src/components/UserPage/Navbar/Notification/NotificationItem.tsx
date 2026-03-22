@@ -17,7 +17,7 @@ export default function NotificationItem({
 }: NotificationItemProps) {
   return (
     <div className="group relative perspective-1000">
-      {/* ស្រមោលពន្លឺចាំងពីក្រោយ (Glow Effect) */}
+
       {isNew && (
         <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-[28px] blur opacity-10 group-hover:opacity-25 transition duration-1000"></div>
       )}
@@ -29,7 +29,7 @@ export default function NotificationItem({
         !isNew && "grayscale-[0.5] opacity-90"
       )}>
         
-        {/* Icon Section - បែប Dynamic Shape */}
+
         <div className="relative shrink-0">
           <div className={cn(
             "flex h-14 w-14 items-center justify-center rounded-[20px] shadow-inner transition-all duration-500 group-hover:scale-110 group-hover:rotate-[10deg]",
@@ -40,7 +40,7 @@ export default function NotificationItem({
             {isNew ? <Sparkles size={22} /> : <Bell size={22} />}
           </div>
           
-          {/* ចំណុចក្រហមតូច (New Indicator) */}
+
           {isNew && (
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
@@ -71,7 +71,7 @@ export default function NotificationItem({
           </p>
         </div>
 
-        {/* Action Button - បែប Minimalist */}
+
         <div className="flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
           <button className="h-9 w-9 flex items-center justify-center bg-slate-900 text-white rounded-xl shadow-lg hover:bg-purple-600 transition-colors">
             <ArrowUpRight size={18} />

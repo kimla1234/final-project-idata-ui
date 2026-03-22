@@ -58,7 +58,7 @@ export const WorkspaceSelector = () => {
         await updateWorkspace({
           id,
           name: tempName.trim(),
-          description: "", // បញ្ជូនអក្សរទទេទៅ ដើម្បីកុំឱ្យ Record ក្នុង Java ចាប់ Error
+          description: "", 
         }).unwrap();
       } catch (err) {
         console.error("Failed to rename workspace", err);
@@ -74,9 +74,9 @@ export const WorkspaceSelector = () => {
       setShowDeleteModal(false);
       setPassword("");
       setWsToDelete(null);
-      // បង្ហាញ toast ជោគជ័យ
+
     } catch (err: any) {
-      // បង្ហាញ error បើ password ខុស (401)
+
       console.error("Delete failed:", err);
     }
   };
@@ -112,7 +112,7 @@ export const WorkspaceSelector = () => {
       <Dropdown isOpen={isOpen} setIsOpen={setIsOpen}>
         <DropdownTrigger className="w-full">
           <div className="group flex cursor-pointer items-center justify-between gap-2 rounded-md px-2 py-1 hover:bg-purple-50">
-            {/* បន្ថែម flex-1 និង overflow-hidden ទៅកាន់ container របស់អក្សរ */}
+
             <div className="flex flex-1 items-center overflow-hidden">
               <span className="truncate whitespace-nowrap text-[15px] font-medium text-dark dark:text-white">
                 {/* Dynamic Label */}
@@ -120,7 +120,7 @@ export const WorkspaceSelector = () => {
               </span>
             </div>
 
-            {/* បន្ថែម flex-shrink-0 ដើម្បីកុំឱ្យ icon រួញតូចពេលអក្សរវែង */}
+
             <svg
               className="h-4 w-4 flex-shrink-0 text-gray-500"
               fill="none"
@@ -194,9 +194,9 @@ export const WorkspaceSelector = () => {
                             onKeyDown={(e) => {
                               if (e.key === "Enter") handleRename(workspace.id);
                               if (e.key === "Escape") setEditingId(null);
-                              e.stopPropagation(); // ការពារ Event ក្នុង Input
+                              e.stopPropagation(); 
                             }}
-                            // សំខាន់៖ ការពារកុំឱ្យ useClickOutside ចាប់បានពេលចុចក្នុង Input
+
                             onClick={(e) => {
                               e.stopPropagation();
                               e.nativeEvent.stopImmediatePropagation();
@@ -224,15 +224,15 @@ export const WorkspaceSelector = () => {
 
                   <ContextMenuContent
                     className="w-48 bg-white"
-                    // ឃាត់មិនឱ្យវាបិទ Dropdown ពេលយើងចុចខាងក្នុង ContextMenu
+
                     onCloseAutoFocus={(e) => e.preventDefault()}
                   >
                     <ContextMenuItem
                       onSelect={(e) => {
-                        // ១. បញ្ឈប់ Radix ពីការបិទ Menu
+
                         e.preventDefault();
 
-                        // ២. បញ្ឈប់ Event កុំឱ្យរត់ទៅដល់ useClickOutside របស់ Dropdown
+
                         (e as any).nativeEvent?.stopImmediatePropagation();
 
                         setEditingId(workspace.id);
@@ -248,7 +248,7 @@ export const WorkspaceSelector = () => {
 
                     <ContextMenuItem
                       onSelect={() => {
-                        // រុញទៅកាន់ Page បញ្ជាក់ Password
+
                         router.push(
                           `/workspaces/${workspace.id}/confirm-delete`,
                         );

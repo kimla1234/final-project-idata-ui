@@ -8,10 +8,10 @@ import { ArrowRight, FileText, Zap, ShieldCheck, Layers, MousePointer2 } from "l
 export default function HeroSection() {
   return (
     <main className="bg-white dark:bg-slate-950">
-      {/* 🎯 Herocomponent (ចំណងជើង និង ប៊ូតុងមេ) */}
+
       <Herocomponent />
 
-      {/* 🎯 Banner Section (រូបភាព Dashboard) */}
+
       <section className="relative w-full bg-purple-50/50  dark:bg-slate-900/20">
         <div className="container mx-auto px-4">
           <div className="flex justify-center transition-transform duration-700 hover:scale-[1.01]">
@@ -27,7 +27,7 @@ export default function HeroSection() {
         </div>
       </section>
 
-      {/* 🎯 Revolution Section (Cards ៣) */}
+
       <section className="container mx-auto px-6 py-24">
         <div className="mx-auto mb-16 max-w-4xl rounded-3xl border border-slate-100 bg-white p-10 text-center shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
           <h2 className="text-3xl font-black tracking-tight text-slate-900 md:text-5xl dark:text-white">

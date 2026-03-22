@@ -44,20 +44,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"; // កុំភ្លេច import dialog
-// ទាញយក Hook ពី Redux Service របស់បង
+} from "@/components/ui/dialog"; 
+
 import {
   useGenerateAiMockMutation,
   useGetApiSchemeByIdQuery,
   useGetApiSchemesByFolderQuery,
   useUpdateApiSchemeMutation,
 } from "@/redux/service/apiScheme";
-//import SwaggerUI from "swagger-ui-react";
+
 import "swagger-ui-react/swagger-ui.css";
 import dynamic from "next/dynamic";
 import { useTogglePublishStatusMutation } from "@/redux/service/community";
 
-// ប្រើ dynamic import ដើម្បីកុំឱ្យមានបញ្ហា SSR
+
 const SwaggerUI = dynamic(() => import("swagger-ui-react"), {
   ssr: false,
   loading: () => <div className="p-10 text-center">Loading Swagger...</div>,
@@ -76,13 +76,13 @@ export default function SchemaDetailPage() {
 
   const id = params.id;
 
-  // --- 🎯 State បន្ថែមសម្រាប់ Publish Logic ---
+
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
   const [publishDescription, setPublishDescription] = useState("");
 
-  // ១. បន្ថែម State សម្រាប់គ្រប់គ្រង Modal និងទិន្នន័យ Publish
 
-  // ១. ហៅ Mutation hook
+
+
   const [generateAiMock, { isLoading: isMocking }] =
     useGenerateAiMockMutation();
   const [aiPrompt, setAiPrompt] = useState("");
@@ -94,11 +94,11 @@ export default function SchemaDetailPage() {
   const [togglePublish, { isLoading: isPublishing }] =
     useTogglePublishStatusMutation();
 
-  // ១. បង្កើត State សម្រាប់កាន់ទិន្នន័យពី Backend
+
   const [fields, setFields] = useState<any[]>([]);
   const [keys, setKeys] = useState<any[]>([]);
 
-  // ១. ចាប់យក IDs ពី URL
+
   const workspaceId = params.workspaceId;
   //const folderId = params.id ? Number(params.id) : 0;
   const folderId = params.folderId
@@ -109,9 +109,9 @@ export default function SchemaDetailPage() {
   const schemaId = params.schemaId ? Number(params.schemaId) : null;
   const { data: allSchemesInFolder } = useGetApiSchemesByFolderQuery(folderId, {
     skip: !folderId,
-    refetchOnMountOrArgChange: true, // 🎯 បង្ខំឱ្យទាញទិន្នន័យថ្មី
+    refetchOnMountOrArgChange: true, 
   });
-  // ២. Fetch ទិន្នន័យ Schema តាម ID
+
   const {
     data: schema,
     isLoading,
@@ -120,20 +120,20 @@ export default function SchemaDetailPage() {
     skip: !schemaId,
   });
 
-  // ១. បង្កើត Logic សម្រាប់ Extract ព័ត៌មានពី URL នៅខាងក្រៅ useEffect (ក្នុង Component Body)
+
   const url = schema?.endpointUrl || "";
 
-  // ប្រើ Regex ដើម្បីចាប់យក projectKey (រកពាក្យ engine- រួចយកពាក្យបន្ទាប់មក)
+
   const projectKeyMatch = url.match(/engine-([^\/]+)/);
   const projectKey = projectKeyMatch ? projectKeyMatch[1] : "";
 
-  // យក Slug (ពាក្យចុងក្រោយគេនៃ URL)
+
   const urlParts = url.split("/");
   const realSlug = urlParts[urlParts.length - 1] || "";
 
   useEffect(() => {
     if (schema) {
-      // ១. Update ឈ្មោះ Schema សម្រាប់ Display & Edit
+
       setSchemaName(schema.name || "");
 
       // ២. Map Properties (FieldName)
@@ -150,8 +150,8 @@ export default function SchemaDetailPage() {
       if (schema.keys && Array.isArray(schema.keys)) {
         const mappedKeys = schema.keys.map((k: any) => ({
           columnName: k.columnName || "",
-          isPk: !!k.primaryKey, // ✅ ប្តូរពី k.isPk មក k.primaryKey
-          isFk: !!k.foreignKey, // ✅ ប្តូរពី k.isFk មក k.foreignKey
+          isPk: !!k.primaryKey, 
+          isFk: !!k.foreignKey, 
           referenceTable: k.referenceTable || "",
         }));
         setKeys(mappedKeys);
@@ -159,49 +159,28 @@ export default function SchemaDetailPage() {
     }
   }, [schema]);
 
-useEffect(() => {
+  useEffect(() => {
     const fetchAndFixSwagger = async () => {
       try {
-        // 🎯 ១. បាញ់ទៅយក JSON ពី Backend
+
         const response = await fetch("https://api.idata.fit/v3/api-docs");
         if (!response.ok) throw new Error("Failed to fetch API docs");
 
         const data: any = await response.json();
 
-        // 🎯 ២. ទាញយកតម្លៃ projectKey និង realSlug ឱ្យច្បាស់
+
         const url = schema?.endpointUrl || "";
         const projectKeyMatch = url.match(/engine-([^\/]+)/);
         const projectKey = projectKeyMatch ? projectKeyMatch[1] : "";
         const urlParts = url.split("/");
         const realSlug = (urlParts[urlParts.length - 1] || "").toLowerCase();
 
-        // 🎯 ៣. កំណត់ Server URL ឱ្យទៅ Port 8081 (Engine Port)
+
         data.servers = [
           { url: "https://api.idata.fit", description: "API Engine Server" },
         ];
 
-        // 🎯 ៤. ការកំណត់ Security (បិទ/បើក តាមស្ថានភាព Public/Private)
-        if (schema?.isPublic) {
-          // បើជា Public: លុប Security ចេញឱ្យអស់ ដើម្បីឱ្យ Swagger ហៅប្រើដោយសេរី (No 401)
-          delete data.components?.securitySchemes;
-          data.security = [];
-        } else {
-          // បើជា Private: បន្ថែម Security Definition ដើម្បីឱ្យបង្ហាញប៊ូតុង Authorize (មេសោរ)
-          data.components = {
-            ...data.components,
-            securitySchemes: {
-              ApiKeyAuth: {
-                type: "apiKey",
-                in: "header",
-                name: "x-api-key",
-                description: "បញ្ចូល API Key របស់អ្នក (sk_live_...) ដើម្បីប្រើប្រាស់ API",
-              },
-            },
-          };
-          data.security = [{ ApiKeyAuth: [] }];
-        }
 
-        // 🎯 ៥. ឆែកមើលថា តើវាជាប្រភេទ Auth ឬ CRUD ទូទៅ
         if (realSlug === "auth") {
           data.paths = {
             [`/api/v1/engine-${projectKey}/auth/register`]: {
@@ -259,9 +238,29 @@ useEffect(() => {
                 },
               },
             },
+            [`/api/v1/engine-${projectKey}/auth/refresh`]: {
+              post: {
+                tags: ["Auth Service"],
+                summary: "Refresh expired Access Token",
+                requestBody: {
+                  content: {
+                    "application/json": {
+                      schema: {
+                        type: "object",
+                        properties: {
+                          refreshToken: { type: "string" },
+                        },
+                        example: { refreshToken: "eyJhbG..." },
+                      },
+                    },
+                  },
+                },
+                responses: { "200": { description: "Token refreshed" } },
+              },
+            },
           };
         } else {
-          // --- ករណីជា CRUD ធម្មតា ---
+
           let dynamicExample: Record<string, any> = {};
           fields.forEach((f: any) => {
             const fieldName = f.name || f.fieldName;
@@ -316,7 +315,7 @@ useEffect(() => {
           }
         }
 
-        // 🎯 ៦. បោះចូល State ដើម្បីឱ្យ SwaggerUI បង្ហាញ
+
         setSpec(data);
       } catch (error) {
         console.error("❌ Swagger Spec Error:", error);
@@ -327,7 +326,7 @@ useEffect(() => {
     if (schema) fetchAndFixSwagger();
   }, [schema, fields, swaggerKey]);
 
-  // ១. បង្កើត Example JSON (ដក id ចេញ)
+
   let dynamicExample: Record<string, any> = {};
 
   function getSampleValue(type: any) {
@@ -365,7 +364,7 @@ useEffect(() => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // ២. Function សម្រាប់ Handle ការប្តូរ Status
+
   const handleTogglePublic = async () => {
     if (!schema) return;
     const slugOnly = schema.endpointUrl.split("/").pop();
@@ -393,13 +392,8 @@ useEffect(() => {
       label: "Schema Editor",
       icon: <Edit3 className="size-4" />,
     },
-    {
-      id: "Docs",
-      label: "Documentation",
-      icon: <FileText className="size-4" />,
-    },
+
     { id: "Swagger", label: "Swagger UI", icon: <Globe className="size-4" /> },
-    { id: "Publish", label: "Publish", icon: <Send className="size-4" /> },
   ];
 
   if (isLoading) {
@@ -415,31 +409,31 @@ useEffect(() => {
     );
   }
 
-  // រកមើលជួរកូដប្រហែលជួរទី ៣០៥ (apiEndpoints variable)
+
   const apiEndpoints =
     realSlug === "auth"
       ? [
           {
             method: "POST",
-            path: `${schema?.endpointUrl}/register`,
+            path: `https://api.idata.fit${schema?.endpointUrl}/register`,
             desc: "ចុះឈ្មោះអ្នកប្រើប្រាស់ថ្មី (Register)",
             color: "green",
           },
           {
             method: "POST",
-            path: `${schema?.endpointUrl}/login`,
+            path: `https://api.idata.fit${schema?.endpointUrl}/login`,
             desc: "ចូលប្រើប្រាស់ដើម្បីយក Token (Login)",
             color: "green",
           },
           {
             method: "POST",
-            path: `${schema?.endpointUrl}/refresh`,
+            path: `https://api.idata.fit${schema?.endpointUrl}/refresh`,
             desc: "បន្តសុពលភាព Token (Refresh Token)",
             color: "orange",
           },
         ]
       : [
-          // នេះជា CRUD ធម្មតាដែលបងមានស្រាប់
+
           {
             method: "GET",
             path: schema?.endpointUrl,
@@ -521,12 +515,12 @@ useEffect(() => {
     setKeys(keys.filter((_, i) => i !== index));
   };
 
-  // បន្ថែមជួរថ្មីក្នុង Properties
+  //  Properties
   const addFieldRow = () => {
     setFields([...fields, { name: "", type: "string", require: false }]);
   };
 
-  // លុបជួរក្នុង Properties
+  //  Properties
   const removeFieldRow = (index: number) => {
     if (fields.length > 1) {
       // ទុកយ៉ាងហោចណាស់ ១ ជួរ
@@ -552,7 +546,7 @@ useEffect(() => {
   };
 
   const getRelativeTime = (dateString: string | undefined) => {
-    if (!dateString) return "អម្បាញ់មិញ";
+    if (!dateString) return "just now";
 
     const now = new Date();
     const updatedDate = new Date(dateString);
@@ -560,16 +554,16 @@ useEffect(() => {
       (now.getTime() - updatedDate.getTime()) / 1000,
     );
 
-    if (diffInSeconds < 60) return "អម្បាញ់មិញ";
+    if (diffInSeconds < 60) return "just now";
 
     const diffInMinutes = Math.floor(diffInSeconds / 60);
-    if (diffInMinutes < 60) return `${diffInMinutes} នាទីមុន`;
+    if (diffInMinutes < 60) return `${diffInMinutes} minutes ago`;
 
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `${diffInHours} ម៉ោងមុន`;
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
 
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays} ថ្ងៃមុន`;
+    if (diffInDays < 7) return `${diffInDays} days ago`;
 
     // បើលើសពី ៧ ថ្ងៃ ឱ្យវាបង្ហាញកាលបរិច្ឆេទធម្មតា
     return updatedDate.toLocaleDateString("km-KH", {
@@ -579,15 +573,17 @@ useEffect(() => {
     });
   };
 
-const handleStartAiGeneration = async () => {
-  const schemaId = schema?.id;
-  if (!schemaId || !aiPrompt.trim()) return;
+  const handleStartAiGeneration = async () => {
+    const schemaId = schema?.id;
+    if (!schemaId || !aiPrompt.trim()) return;
 
-  // 🎯 បង្កើត Schema Context ដើម្បីប្រាប់ AI ឱ្យស្គាល់ Field ពិតប្រាកដ
-  const schemaContext = fields.map(f => `- ${f.name} (${f.type})`).join("\n");
-  
-  // 🎯 រៀបចំ Prompt ថ្មីដែលបង្ខំឱ្យ AI ដើរតាម Schema
-  const finalPrompt = `
+    // 🎯 បង្កើត Schema Context ដើម្បីប្រាប់ AI ឱ្យស្គាល់ Field ពិតប្រាកដ
+    const schemaContext = fields
+      .map((f) => `- ${f.name} (${f.type})`)
+      .join("\n");
+
+    // 🎯 រៀបចំ Prompt ថ្មីដែលបង្ខំឱ្យ AI ដើរតាម Schema
+    const finalPrompt = `
     Strictly use only these fields from the schema:
     ${schemaContext}
     
@@ -596,19 +592,19 @@ const handleStartAiGeneration = async () => {
     Important: Do not add any extra fields that are not in the list above.
   `;
 
-  try {
-    // បាញ់ទៅ Backend ជាមួយ finalPrompt
-    await generateAiMock({ 
-      id: Number(schemaId), 
-      instruction: finalPrompt 
-    }).unwrap();
-    
-    setIsAiModalOpen(false);
-    setAiPrompt("");
-  } catch (error) {
-    console.error("Mutation Error:", error);
-  }
-};
+    try {
+      // បាញ់ទៅ Backend ជាមួយ finalPrompt
+      await generateAiMock({
+        id: Number(schemaId),
+        instruction: finalPrompt,
+      }).unwrap();
+
+      setIsAiModalOpen(false);
+      setAiPrompt("");
+    } catch (error) {
+      console.error("Mutation Error:", error);
+    }
+  };
 
   const handleDownloadJson = () => {
     if (!spec) {
@@ -673,11 +669,6 @@ const handleStartAiGeneration = async () => {
               <ArrowLeft className="size-5" />
             </button>
             <div>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <span>Workspace {workspaceId}</span>
-                <span>/</span>
-                <span>Folder {folderId}</span>
-              </div>
               <div className="flex items-center gap-2">
                 <Database className="size-5 text-blue-500" />
                 <h1 className="w-fit text-lg font-bold text-gray-800 dark:text-white">
@@ -687,7 +678,7 @@ const handleStartAiGeneration = async () => {
                     onChange={(e) => setSchemaName(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
-                        e.currentTarget.blur(); // ធ្វើឱ្យបាត់ Focus ពី Input ពេលចុច Enter
+                        e.currentTarget.blur(); 
                         handleSaveSchemaChanges();
                       }
                     }}
@@ -699,13 +690,10 @@ const handleStartAiGeneration = async () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800">
-              <Share2 className="size-4 text-gray-500" /> Share
-            </button>
             <button
               onClick={handlePublishClick}
               disabled={isPublishing}
-              className="..."
+              className="rounded-lg bg-gradient-to-r from-purple-400 to-orange-500 px-3 py-1.5 text-sm font-medium text-white hover:from-purple-500 hover:to-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {schema?.isPublished ? "Unpublish API" : "Publish to Community"}
             </button>
@@ -1068,17 +1056,6 @@ const handleStartAiGeneration = async () => {
                           </span>
                         </div>
 
-                        {/* Data Count */}
-                        <div className="flex items-center justify-between text-[13px]">
-                          <div className="flex items-center gap-2 text-gray-400">
-                            <Database className="size-3.5" />
-                            <span>Data Count</span>
-                          </div>
-                          <span className="font-bold text-gray-900 dark:text-white">
-                            {schema?.dataCount || 0} Records
-                          </span>
-                        </div>
-
                         {/* Last Sync/Update Time */}
                         <div className="flex items-center justify-between text-[13px]">
                           <div className="flex items-center gap-2 text-gray-400">
@@ -1136,39 +1113,6 @@ const handleStartAiGeneration = async () => {
                           នឹងត្រូវបានកត់ត្រាទុកក្នុងប្រព័ន្ធសុវត្ថិភាព។
                         </p>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Integration Card (Premium Dark) */}
-                  <div className="relative overflow-hidden rounded-2xl bg-gray-900 p-6 text-white shadow-2xl transition-transform hover:scale-[1.02]">
-                    <div className="absolute -right-4 -top-4 size-24 rounded-full bg-orange-500/10 blur-2xl" />
-                    <div className="relative z-10">
-                      <div className="mb-4 flex size-10 items-center justify-center rounded-xl bg-orange-500 shadow-lg shadow-orange-500/40">
-                        <Zap className="size-5 text-white" />
-                      </div>
-                      <h4 className="mb-2 text-[15px] font-bold">
-                        Pro Integration Tip
-                      </h4>
-                      <p className="text-[12px] leading-relaxed text-gray-400">
-                        ប្រើប្រាស់{" "}
-                        <code className="mx-1 rounded bg-white/10 px-1.5 py-0.5 font-mono text-orange-400">
-                          Bearer Token
-                        </code>{" "}
-                        ក្នុង Header ដើម្បីទទួលបានសិទ្ធិចូលប្រើប្រាស់ទិន្នន័យ។
-                      </p>
-                      {/* ប៊ូតុង Copy URL (Optional) */}
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText(
-                            schema?.endpointUrl || "",
-                          );
-                          alert("Copied to clipboard!");
-                        }}
-                        className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg bg-white/5 py-2 text-[11px] font-medium transition-colors hover:bg-white/10"
-                      >
-                        <Copy className="size-3" />
-                        Copy API Endpoint
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -1447,8 +1391,8 @@ const handleStartAiGeneration = async () => {
                       Cancel
                     </button>
                     <button
-                      onClick={handleStartAiGeneration} // 🎯 ហៅ Function ខាងលើ
-                      disabled={isMocking || !aiPrompt.trim()} // 🎯 បិទប៊ូតុងពេលកំពុង Generate
+                      onClick={handleStartAiGeneration}
+                      disabled={isMocking || !aiPrompt.trim()}
                       className="flex items-center gap-2 rounded-lg bg-purple-600 px-6 py-2 text-sm font-bold text-white transition-all hover:bg-purple-700 disabled:bg-purple-300"
                     >
                       {isMocking ? (
@@ -1523,7 +1467,7 @@ const handleStartAiGeneration = async () => {
                     <button
                       onClick={() =>
                         handleCopy(
-                          `http://localhost:8080/api/v1/engine-${projectKey}/${realSlug}`,
+                          `https://api.idata.fit/api/v1/engine-${projectKey}/${realSlug}`,
                         )
                       }
                       className="flex h-9 items-center gap-2 rounded-lg bg-white px-3 text-xs font-medium text-gray-600 shadow-sm hover:bg-gray-50"
@@ -1562,29 +1506,31 @@ const handleStartAiGeneration = async () => {
                   }
                 `}</style>
                 <SwaggerUI
-  key={swaggerKey}
-  spec={spec}
-  docExpansion="list"
-  tryItOutEnabled={true}
-  persistAuthorization={true}
-  requestInterceptor={(request: any) => {
-    // 🎯 ១. ប្តូរ URL ដូចដើម
-    if (projectKey && realSlug) {
-      request.url = request.url
-        .replace("{projectKey}", projectKey)
-        .replace("{slug}", realSlug);
-    }
+                  key={swaggerKey}
+                  spec={spec}
+                  docExpansion="list"
+                  tryItOutEnabled={true}
+                  persistAuthorization={true}
+                  requestInterceptor={(request: any) => {
+                    if (projectKey && realSlug) {
+                      request.url = request.url
+                        .replace("{projectKey}", projectKey)
+                        .replace("{slug}", realSlug);
+                    }
 
-    // 🎯 ២. បើ API ជា Public ប៉ុន្តែ Backend នៅតែទាមទារ Key 
-    // យើងអាចបង្ខំ (Force) ផ្ញើ Key ទៅឱ្យវាហ្មង ដើម្បីកុំឱ្យជាប់ 401
-    if (schema?.isPublic && schema?.apiKey) {
-      request.headers["x-api-key"] = schema.apiKey;
-    }
+                    const currentApiKey =
+                      schema?.workspace?.apiKey || schema?.apiKey;
 
-    return request;
-  }}
-/>
-                
+                    if (currentApiKey) {
+                      request.headers = {
+                        ...request.headers,
+                        "x-api-key": currentApiKey,
+                      };
+                    }
+
+                    return request;
+                  }}
+                />
               </div>
             </div>
           )}

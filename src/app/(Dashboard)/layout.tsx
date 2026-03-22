@@ -13,6 +13,8 @@ import { Inter, Suwannaphum } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import AiKimla from "@/hooks/AiKimla";
+import WorkspaceAutoActivator from "../WorkspaceAutoActivator";
+import { WorkspaceInitializer } from "@/components/DashboardCompoenents/Layouts/WorkspaceInitializer";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -61,13 +63,14 @@ export default async function LocalLayout({
            <RoleGuard>
           {/* Wrap everything inside the body to ensure context is available everywhere */}
           <SidebarProvider>
+            <WorkspaceInitializer />
             <div className="flex min-h-screen">
               <Sidebar />
               <div className="flex flex-1 flex-col min-w-0 bg-gray-2 dark:bg-[#020d1a] transition-all duration-300">
                 <Header />
                 <main className="mx-auto w-full max-w-screen-2xl p-4 md:p-7.5">
                   {children}
-                  <AiKimla />
+                  
                 </main>
               </div>
             </div>

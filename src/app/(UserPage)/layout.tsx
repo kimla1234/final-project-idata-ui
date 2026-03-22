@@ -38,6 +38,8 @@ const suwannaphum = Suwannaphum({
   variable: "--font-suwannaphum",
 });
 
+
+
 export default function RootLayout({
   children,
 }: {

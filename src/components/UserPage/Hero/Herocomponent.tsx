@@ -4,24 +4,24 @@ import React from "react";
 import { MoveRight } from "lucide-react"; 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux"; // 🎯 ប្រើ useSelector ដើម្បីទាញ State
+import { useSelector } from "react-redux"; 
 import { selectAuthentication } from "@/redux/feature/auth/authSlice";
 
 
 function Herocomponent() {
   const router = useRouter();
   
-  // 🎯 ឆែកមើលថា តើ User បាន Login ឬនៅ តាមរយៈ Redux State
+  
   const isAuthenticated = useSelector(selectAuthentication);
 
   const handleCTA = (e: React.MouseEvent) => {
     e.preventDefault();
     
     if (isAuthenticated) {
-      // ✅ បើ Login រួចហើយ (isAuthenticated === true)
+      
       router.push("/dashboard");
     } else {
-      // ❌ បើមិនទាន់ Login ទេ
+
       router.push("/login");
     }
   };

@@ -96,26 +96,26 @@ export default function ApiDetailsSheet({
   });
   const [targetFolderId, setTargetFolderId] = useState<string>("");
 
-  // 🎯 ២. ប្រកាស Mutation
+
   const [followUser, { isLoading: isFollowing }] = useFollowUserMutation();
   const [isFollowed, setIsFollowed] = useState(api.isFollowed);
 
-  // 🎯 ៣. បង្កើត Handler សម្រាប់ Follow
+
   const handleFollowClick = async () => {
     const previousState = isFollowed;
-    // ប្តូរ UI ភ្លាមៗ (Optimistic Update)
+
     setIsFollowed(!previousState);
 
     try {
       await followUser(api.ownerUuid).unwrap();
     } catch (error) {
-      // បើ API Error គឺត្រូវត្រឡប់ UI មកសភាពដើមវិញ
+
       setIsFollowed(previousState);
-      //toast.error("ប្រតិបត្តិការមិនជោគជ័យ");
+
     }
   };
 
-  // បន្ថែម useEffect ខាងក្រោម state របស់បង
+
   useEffect(() => {
     setIsFollowed(api.isFollowed);
   }, [api.isFollowed]);
@@ -125,21 +125,19 @@ export default function ApiDetailsSheet({
 
     if (targetData?.spec) return targetData.spec;
 
-    // ១. ទាញយក projectKey និង slug ចេញពី endpointUrl ពិតប្រាកដ
-    // ឧទាហរណ៍ URL: https://api.idata.fit/api/v1/engine-p-d9eba188/user
     const endpointUrl = targetData?.endpointUrl || "";
 
-    // ប្រើ Regex ដើម្បីចាប់យក engine-xxxx
+
     const projectKeyMatch = endpointUrl.match(/engine-([^\/]+)/);
     const detectedProjectKey = projectKeyMatch
       ? projectKeyMatch[1]
-      : projectKey; // បើអត់មាន ប្រើ props
+      : projectKey; 
 
-    // យកពាក្យចុងក្រោយគេធ្វើជា slug (ក្នុងករណីនេះគឺ "user")
+
     const urlParts = endpointUrl.split("/").filter(Boolean);
     const detectedSlug = urlParts[urlParts.length - 1] || realSlug;
 
-    // ២. រៀបចំ Properties ដូចមុន
+
     const propertiesObj: any = {};
     const requiredFields: string[] = [];
 
@@ -157,7 +155,7 @@ export default function ApiDetailsSheet({
       if (prop.required) requiredFields.push(fieldName);
     });
 
-    // ៣. បង្កើត Path ឱ្យត្រូវតាមអាសយដ្ឋានពិត
+
     const collectionPath = `/api/v1/engine-${detectedProjectKey}/${detectedSlug}`;
     const itemPath = `${collectionPath}/{id}`;
 
@@ -255,7 +253,7 @@ export default function ApiDetailsSheet({
         },
       },
     };
-  }, [apiDetail, api, projectKey, realSlug]); // 🎯 កុំភ្លេចដាក់ projectKey, realSlug ចូល dependency
+  }, [apiDetail, api, projectKey, realSlug]); 
   const [isForkModalOpen, setIsForkModalOpen] = useState(false);
   const handleCopy = (text: string) => {
     if (!text) return;
@@ -323,7 +321,7 @@ export default function ApiDetailsSheet({
                   <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-white shadow-md ring-2 ring-blue-500/20">
                     <Image
                       unoptimized
-                      src={api.ownerAvatar || "/default-avatar.png"}
+                      src={api.ownerAvatar || "/placeholder.png"}
                       width={48}
                       height={48}
                       alt=""
@@ -337,7 +335,7 @@ export default function ApiDetailsSheet({
                   </SheetTitle>
                   <div className="mt-0.5 flex items-center gap-2 text-white">
                     <span className="text-gray-300">{api.ownerName} •</span>
-                    {/* 🎯 ប្តូរពាក្យ Follow ទៅតាម State ដែរ */}
+
                     <span
                       className={`text-md font-bold ${isFollowed ? "text-green-400" : "text-blue-400"}`}
                     >
@@ -349,7 +347,7 @@ export default function ApiDetailsSheet({
             </div>
 
             <div className="mx-auto max-w-full space-y-12 rounded-md bg-white px-10 py-12 pb-32">
-              {/* --- 🎯 Header Section (AI Ready) --- */}
+
               <div className="rounded-2xl border border-gray-100 bg-white p-8 shadow-sm">
                 <div className="flex items-start justify-between">
                   <div>
@@ -459,16 +457,32 @@ export default function ApiDetailsSheet({
               </div>
 
               {/* Security Info */}
-              <div className="flex gap-6 rounded-[32px] bg-slate-900 p-8 text-white">
-                <ShieldCheck size={32} className="text-blue-400" />
-                <div>
-                  <h5 className="text-lg font-black">
-                    Security & Rate Limiting
-                  </h5>
-                  <p className="mt-1 text-sm font-medium text-slate-400">
-                    API calls require a Bearer Token. Rate limit is 100
-                    requests/min for Free Tier.
-                  </p>
+              <div className="flex flex-col gap-4 text-gray-700 rounded-lg bg-purple-50 p-8 ">
+            
+
+                {/* Access Restriction Info */}
+                <div className=" flex gap-6  border-slate-800 ">
+                  <div className="w-[32px]" />{" "}
+                  {/* Spacer to align with icon above */}
+                  <div>
+                    <p className="text-sm font-medium text-slate-700">
+                      <span className="font-bold uppercase text-orange-400">
+                        Note:
+                      </span>{" "}
+                      Public access is restricted to{" "}
+                      <code className="rounded bg-slate-400 px-1.5 py-0.5 text-blue-600">
+                        GET
+                      </code>{" "}
+                      requests only.
+                    </p>
+                    <p className="mt-2 text-xs leading-relaxed text-slate-700">
+                      To use all methods (POST, PUT, DELETE), please{" "}
+                      <span className="cursor-pointer font-bold text-blue-400 underline decoration-blue-400/30 underline-offset-4 hover:text-blue-300">
+                        Fork
+                      </span>{" "}
+                      this API into your own workspace.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -480,7 +494,7 @@ export default function ApiDetailsSheet({
               <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-white shadow-md ring-2 ring-blue-500/20">
                 <Image
                   unoptimized
-                  src={api.ownerAvatar || "/default-avatar.png"}
+                  src={api.ownerAvatar || "/placeholder.png"}
                   width={48}
                   height={48}
                   alt=""
@@ -512,7 +526,7 @@ export default function ApiDetailsSheet({
               {
                 Icon: Box,
                 label: "Fork API",
-                action: () => handleForkClick(api), // 🎯 បើក Modal Fork
+                action: () => handleForkClick(api), //  Modal Fork
               },
               {
                 Icon: FolderHeart,
@@ -522,7 +536,7 @@ export default function ApiDetailsSheet({
               {
                 Icon: Share2,
                 label: "ចែករំលែក",
-                action: () => handleCopy(api.endpointUrl), // 🎯 Copy Link
+                action: () => handleCopy(api.endpointUrl), //  Copy Link
               },
             ].map(({ Icon, label, action }, idx) => (
               <div
@@ -537,7 +551,7 @@ export default function ApiDetailsSheet({
                 </div>
 
                 <button
-                  onClick={action} // 🎯 ភ្ជាប់ Action
+                  onClick={action} //  Action
                   className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-gray-600 shadow-sm ring-1 ring-gray-100 transition hover:bg-blue-600 hover:text-white active:scale-90"
                 >
                   <Icon size={20} />

@@ -26,7 +26,7 @@ import Image from "next/image";
 import { useGetApiSchemesByFolderQuery } from "@/redux/service/apiScheme";
 
 export default function MyProfile() {
-  // ១. ទាញយកទិន្នន័យពី API
+
   const {
     data: user,
     isLoading,
@@ -34,7 +34,7 @@ export default function MyProfile() {
     refetch,
   } = useGetUserQuery(undefined);
 
-  // ២. Mutation សម្រាប់ Upload រូបភាព និង Update Profile
+
   const [postImage, { isLoading: isUploading }] = usePostImageMutation();
   const [updateProfile, { isLoading: isUpdatingProfile }] =
     useUpdateProfileUserMutation();
@@ -44,11 +44,11 @@ export default function MyProfile() {
   const bannerInputRef = useRef<HTMLInputElement>(null);
   //const { data: user, isLoading, isError, refetch } = useGetUserQuery(undefined);
 
-  // ២. ទាញយកបញ្ជី API Schemes (ឧទាហរណ៍៖ folderId = 1 ឬយកពី state ណាមួយ)
-  // បងអាចប្តូរលេខ 1 ទៅតាម Folder ជាក់ស្តែងរបស់ User
+
+
   const { data: schemes, isLoading: isLoadingSchemes } =
     useGetApiSchemesByFolderQuery(14);
-  // ៣. Sync រូបភាពពី API ចូល State (Preview)
+
   useEffect(() => {
     if (user?.profileImage) {
       setAvatar(user.profileImage);
@@ -57,8 +57,8 @@ export default function MyProfile() {
     }
   }, [user]);
 
-  // ៤. 🎯 Flow សំខាន់: Upload រូបភាព -> Get URL -> Update User Profile
-  // ៤. 🎯 Flow: Upload រូបភាព -> Get URL -> Update User Profile
+
+
   const handleUploadProcess = async (
     event: React.ChangeEvent<HTMLInputElement>,
     type: "profile" | "cover",
@@ -70,15 +70,14 @@ export default function MyProfile() {
     uploadFormData.append("file", file);
 
     try {
-      // --- ១. Upload រូបភាព ---
+
       const uploadRes = await postImage(uploadFormData).unwrap();
 
-      // ទាញយក URI (តាមរយៈ Response របស់បងគឺ uploadRes.uri)
+
       const imageUri = uploadRes?.uri;
 
       if (imageUri) {
-        // --- ២. Update User Profile ---
-        // ចំណាំ៖ ត្រូវប្រាកដថា Key image_profile និង coverImage ត្រូវតាម Backend របស់បង
+
         const updatePayload =
           type === "profile"
             ? { profileImage: imageUri }
@@ -88,10 +87,10 @@ export default function MyProfile() {
 
         await updateProfile({
           uuid: user.uuid,
-          user: updatePayload, // ផ្ញើ Object ទៅកាន់ Mutation
+          user: updatePayload, 
         }).unwrap();
 
-        // ជោគជ័យ៖ ទាញទិន្នន័យថ្មី
+
         refetch();
         alert("ជោគជ័យ៖ រូបភាពត្រូវបានផ្លាស់ប្តូរ!");
       }
@@ -132,7 +131,7 @@ export default function MyProfile() {
       >
         {user.coverImage ? (
           <img
-            src={user.coverImage}
+            src={user.coverImage || "/imageplaceholder.png"}
             alt="Banner"
             className="h-full w-full object-cover"
           />
@@ -173,7 +172,7 @@ export default function MyProfile() {
               >
                 <Image
                   unoptimized
-                  src={avatar || ""}
+                  src={avatar || "/placeholder.png"}
                   alt="Profile"
                   width={1000}
                   height={1000}
@@ -274,7 +273,7 @@ export default function MyProfile() {
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                  {/* ប៊ូតុងសម្រាប់បង្កើតថ្មី */}
+
                   <div className="group flex aspect-[4/3] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 transition-all hover:border-blue-400 hover:bg-blue-50/50">
                     <FilePlus2 className="h-8 w-8 text-gray-400 group-hover:text-blue-500" />
                     <p className="mt-4 text-sm font-bold text-gray-500 group-hover:text-blue-600">
@@ -282,7 +281,7 @@ export default function MyProfile() {
                     </p>
                   </div>
 
-                  {/* ៣. បង្ហាញបញ្ជីដែលទាញបានពី API */}
+
                   {isLoadingSchemes ? (
                     <div className="flex aspect-[4/3] items-center justify-center">
                       <Loader2 className="h-6 w-6 animate-spin text-gray-400" />

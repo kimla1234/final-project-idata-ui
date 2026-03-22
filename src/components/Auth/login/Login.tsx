@@ -8,13 +8,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import {
   setAccessToken,
+  setAuthenticated,
+  setUser,
   //setAuthenticated,
 } from "@/redux/feature/auth/authSlice";
 import { useToast } from "@/hooks/use-toast";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import Image from "next/image";
 import { IoCloseSharp } from "react-icons/io5";
-
+import { setActiveWorkspace } from "@/redux/feature/workspace/workspaceSlice";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -25,7 +27,7 @@ export default function Login() {
   const searchParams = useSearchParams();
   //const token = useSelector((state: RootState) => state.auth.token);
 
- const [redirectPath, setRedirectPath] = useState("/");
+  const [redirectPath, setRedirectPath] = useState("/");
 
   // Parse redirect query from URL
   useEffect(() => {
@@ -34,7 +36,6 @@ export default function Login() {
     setRedirectPath(redirect);
   }, []);
 
- 
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -71,10 +72,20 @@ export default function Login() {
           return;
         }
 
-        const { accessToken } = data;
+        const { accessToken, user, workspaces } = data;
         if (accessToken) {
           dispatch(setAccessToken(accessToken));
-
+          dispatch(setAuthenticated(true));
+          dispatch(setUser(user));
+          if (workspaces && workspaces.length > 0) {
+            const firstWorkspace = workspaces[0];
+            dispatch(
+              setActiveWorkspace({
+                id: firstWorkspace.id,
+                name: firstWorkspace.name,
+              }),
+            );
+          }
           console.log("Dispatched Access Token:", accessToken);
           toast({
             title: "Logged in Successfully 🎉",
@@ -144,26 +155,6 @@ export default function Login() {
                 <p className="mt-2 text-gray-500">
                   Please enter your details to login.
                 </p>
-              </div>
-
-              <button
-                type="button"
-                className="mb-6 flex w-full items-center justify-center rounded-xl border border-gray-300 px-4 py-3 font-medium text-gray-700 transition-all duration-300 hover:bg-gray-50 active:scale-95"
-              >
-                <img
-                  src="https://logowik.com/content/uploads/images/985_google_g_icon.jpg"
-                  alt="Google"
-                  className="mr-3 h-5 w-auto"
-                />
-                Continue with Google
-              </button>
-
-              <div className="my-6 flex items-center">
-                <div className="flex-grow border-t border-gray-200"></div>
-                <span className="mx-4 text-xs font-bold uppercase text-gray-400">
-                  OR
-                </span>
-                <div className="flex-grow border-t border-gray-200"></div>
               </div>
 
               <form onSubmit={formik.handleSubmit} className="space-y-4">

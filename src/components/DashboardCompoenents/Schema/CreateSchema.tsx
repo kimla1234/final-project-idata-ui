@@ -27,7 +27,7 @@ export default function CreateSchema({ folderId }: CreateSchemaProps) {
   const [createApiScheme, { isLoading }] = useCreateApiSchemeMutation();
 
 
-  // State សម្រាប់គ្រប់គ្រងទិន្នន័យឱ្យត្រូវតាម DTO របស់បង
+
   const [formData, setFormData] = useState({
     name: "",
     endpointUrl: "",
@@ -55,7 +55,7 @@ export default function CreateSchema({ folderId }: CreateSchemaProps) {
     },
   ]);
 
-  // Logic សម្រាប់បន្ថែម/លុប Properties
+
   const addProperty = () =>
     setProperties([
       ...properties,
@@ -64,7 +64,7 @@ export default function CreateSchema({ folderId }: CreateSchemaProps) {
   const removeProperty = (index: number) =>
     setProperties(properties.filter((_, i) => i !== index));
 
-  // Logic សម្រាប់បន្ថែម/លុប Keys
+
   const addKey = () =>
     setKeys([
       ...keys,
@@ -93,16 +93,16 @@ const handleGenerate = async () => {
     });
     handleReset();
   } catch (error: any) {
-    // 🎯 កែត្រង់នេះដើម្បីមើល Error Message ពី Backend ឱ្យច្បាស់
+    
     const serverError = error?.data?.message || error?.data || "មានបញ្ហាក្នុងការបង្កើត Schema";
     
     toast({
-      variant: "destructive", // ប្រើពណ៌ក្រហមសម្រាប់ Error
+      variant: "destructive", 
       title: "Generate Failed",
       description: serverError,
     });
 
-    console.log("Full Error Object:", error); // មើល Object ទាំងមូល
+    console.log("Full Error Object:", error); 
   }
 };
 
@@ -141,8 +141,8 @@ const handleGenerate = async () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="flex items-center gap-1.5 rounded bg-orange-500 px-3 py-1 text-[11px] font-semibold text-white shadow-sm shadow-orange-500/20 transition hover:bg-orange-600">
-          <Plus className="size-3" /> Add new schema
+        <button className="flex items-center gap-1.5 rounded bg-orange-500 px-3 py-1.5 text-[14px] font-semibold text-white shadow-sm shadow-orange-500/20 transition hover:bg-orange-600">
+           Add new schema
         </button>
       </SheetTrigger>
 

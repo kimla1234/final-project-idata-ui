@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-// 🎯 សូមពិនិត្យមើល Path ខាងក្រោមឱ្យត្រូវតាម Folder របស់បង (ឧទាហរណ៍៖ @/redux/features/workspace/workspaceSlice)
+
 import dynamic from "next/dynamic";
 
 import {
@@ -37,7 +37,7 @@ export default function UploadFile() {
   const router = useRouter();
   const { toast } = useToast();
 
-  // 🎯 ១. ទាញ workspaceId ពី Redux Store (តាមរយៈ slice ដែលបងផ្ញើមក)
+
   const activeWorkspaceId = useSelector(selectActiveWorkspaceId);
   const workspaceId = activeWorkspaceId ? Number(activeWorkspaceId) : 0;
 
@@ -58,7 +58,7 @@ export default function UploadFile() {
   const [createFolder, { isLoading: isCreatingFolder }] =
     useCreateFolderMutation();
 
-  // 🎯 ២. Fetch Folders តាមរយៈ workspaceId (បើសិនជាអត់មាន ID វានឹង Skip)
+
   const {
     data: folders,
     isLoading: isFetchingFolders,
@@ -77,7 +77,7 @@ export default function UploadFile() {
 
   // ៤. Handle Preview (AI Analysis)
   const handlePreviewClick = async () => {
-    // ១. ពិនិត្យមើលថាតើមានរើស File ហើយឬនៅ
+
     if (!file) {
       return toast({
         variant: "destructive",
@@ -86,7 +86,7 @@ export default function UploadFile() {
       });
     }
 
-    // ២. ពិនិត្យមើលថាតើមានដាក់ឈ្មោះ Schema ហើយឬនៅ
+
     if (!schemaName.trim()) {
       return toast({
         variant: "destructive",
@@ -97,15 +97,15 @@ export default function UploadFile() {
     }
 
     try {
-      // បង្កើត FormData ដើម្បីផ្ញើ File ទៅកាន់ Backend
+
       const formData = new FormData();
       formData.append("file", file);
 
-      // ហៅ Mutation ពី RTK Query
-      // .unwrap() ប្រើសម្រាប់ចាប់យកទិន្នន័យផ្ទាល់ ឬបោះ Error ទៅ catch block បើ Backend បោះ 500
+
+
       const result = await previewSchema(formData).unwrap();
 
-      // បើជោគជ័យ៖ រក្សាទុកទិន្នន័យ AI ចូលក្នុង State ដើម្បីបង្ហាញ Table
+
       setPreviewData(result);
       setShowPreview(true);
 
@@ -116,8 +116,8 @@ export default function UploadFile() {
     } catch (error: any) {
       console.error("Preview Error details:", error);
 
-      // 🎯 ចាប់យកសារ Error ដែលយើងបានកែក្នុង Controller (Map.of("error", ...))
-      // RTK Query ទុកទិន្នន័យ Error ក្នុង error.data
+
+
       const serverError =
         error?.data?.error ||
         "AI Model is currently unavailable or URL is incorrect.";
@@ -131,7 +131,7 @@ export default function UploadFile() {
             : "Check Backend IntelliJ Console for Gemini API logs.",
       });
 
-      // បិទ Preview Table បើមាន Error
+
       setShowPreview(false);
     }
   };
@@ -173,10 +173,10 @@ export default function UploadFile() {
         endpointUrl: schemaName.toLowerCase().replace(/\s+/g, "-"),
         description: previewData?.description || "Generated from file",
         
-        // ធានាថា properties ជា Array នៃ Objects
+
         properties: Array.isArray(previewData?.properties) ? previewData.properties : [],
 
-        // 🎯 ដំណោះស្រាយ Error 500: ប្តូរ String Array ទៅជា Object Array
+
         keys: Array.isArray(previewData?.keys)
           ? previewData.keys.map((k: any) =>
               typeof k === "string" 
@@ -189,7 +189,7 @@ export default function UploadFile() {
         isPublic: false,
       };
 
-      console.log("Saving Payload:", payload); // សម្រាប់ Debug មើល format
+      console.log("Saving Payload:", payload); 
 
       const res = await createSchema(payload).unwrap();
       toast({ title: "Success!", description: "Schema generated successfully." });
@@ -203,7 +203,7 @@ export default function UploadFile() {
     }
   };
 
-  // បង្ហាញ Loading បើអត់ទាន់ឃើញ workspaceId ពី Redux
+
   if (!workspaceId) {
     return (
       <div className="flex h-screen items-center justify-center italic text-gray-500">
@@ -213,8 +213,8 @@ export default function UploadFile() {
   }
 
   return (
-    <div className="min-h-screen p-6 dark:bg-gray-950">
-      <div className="mx-auto max-w-4xl space-y-6">
+    <div className="min-h-screen w-full p-6 dark:bg-gray-950">
+      <div className="mx-auto w-full space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-100 dark:bg-orange-900/20">
@@ -224,9 +224,7 @@ export default function UploadFile() {
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
               Generate API with Files
             </h1>
-            <p className="text-sm italic text-gray-500">
-              Workspace ID: {workspaceId}
-            </p>
+            
           </div>
         </div>
 
@@ -402,7 +400,7 @@ export default function UploadFile() {
               </div>
             </div>
 
-            {/* ប៊ូតុង Confirm ទុកនៅដដែល */}
+
             <button
               onClick={handleFinalCreate}
               disabled={isCreating}

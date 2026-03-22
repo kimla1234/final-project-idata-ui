@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { NAV_DATA } from "./data";
-import { ArrowLeftIcon, ChevronUp } from "./icons"; // បន្ថែម Icon សម្រាប់ចុចបិទបើក
+import { ArrowLeftIcon, ChevronUp } from "./icons"; 
 import { MenuItem } from "./menu-item";
 import { useSidebarContext } from "./sidebar-context";
 import Image from "next/image";
@@ -63,8 +63,9 @@ import {
 } from "../../ui/dropdown-menu";
 import { IoDuplicateOutline } from "react-icons/io5";
 import { format } from "date-fns";
+import { toast } from "@/hooks/use-toast";
 interface SidebarProps {
-  selectedWorkspaceId?: number | null; // ចាប់យក ID ពី Parent (Dashboard)
+  selectedWorkspaceId?: number | null; 
 }
 export function Sidebar() {
   const router = useRouter();
@@ -83,32 +84,32 @@ export function Sidebar() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  // Function សម្រាប់រក្សាទុកឈ្មោះថ្មី
+
 
   const handleRename = async (id: number) => {
-    // ឆែកលក្ខខណ្ឌ៖ ឈ្មោះមិនទទេ និងមាន Workspace ID
+   
     if (tempName.trim() !== "" && activeWorkspaceId) {
       try {
         console.log("Saving folder:", id, "with new name:", tempName);
 
-        // ហៅ API Update
+
         await updateFolder({
           workspaceId: activeWorkspaceId as number,
           folderId: id,
           name: tempName.trim(),
-        }).unwrap(); // ប្រើ unwrap() ដើម្បីចាប់ Error បើមាន
+        }).unwrap(); 
       } catch (error) {
         console.error("Failed to update folder name:", error);
-        // លោកអ្នកអាចថែម Toast notification នៅទីនេះដើម្បីប្រាប់ User
+       
       }
     }
-    setEditingId(null); // បិទរបៀប Edit វិញ ទោះជោគជ័យឬអត់
+    setEditingId(null); 
   };
 
   const handleConfirmDelete = async () => {
     if (folderToDelete && activeWorkspaceId) {
       try {
-        // ១. ហៅ API លុប
+
         await deleteFolder({
           workspaceId: activeWorkspaceId,
           folderId: folderToDelete,
@@ -119,20 +120,20 @@ export function Sidebar() {
           description: "Your folder has been removed.",
         });
 
-        // ២. Logic ប្តូរទៅកាន់ Folder ផ្សេងទៀតដែលនៅសល់
+
         if (pathname.includes(`/folders/${folderToDelete}`)) {
-          // ច្រោះយក Folder ដែលមិនមែនជា Folder ដែលយើងទើបតែលុប
+
           const remainingFolders =
             apiFolders?.filter((f) => f.id !== folderToDelete) || [];
 
           if (remainingFolders.length > 0) {
-            // បើនៅមាន Folder ផ្សេងទៀត ឱ្យវាទៅកាន់ Folder ទី ១ ក្នុងបញ្ជី
+
             const nextFolder = remainingFolders[0];
             router.push(
               `/workspaces/${activeWorkspaceId}/folders/${nextFolder.id}`,
             );
           } else {
-            // បើអស់រលីងពីបញ្ជី ឱ្យវាទៅ Dashboard
+
             router.push(`/dashboard`);
           }
         }
@@ -150,7 +151,7 @@ export function Sidebar() {
   };
   ////////////////////////////////////////////////////////////////
 
-  // ទាញយក ID ពី Redux (ដែលឥឡូវនេះវាជាប់ក្នុង LocalStorage)
+
   const activeWorkspaceId = useSelector(selectActiveWorkspaceId);
   const [isDialogOpenW, setIsOpenWorkspace] = useState(false);
   const { setIsOpen, isOpen, isMobile, toggleSidebar } = useSidebarContext();
@@ -159,7 +160,7 @@ export function Sidebar() {
   const [showAddFolderModal, setShowAddFolderModal] = useState(false);
   const prevWorkspaceIdRef = useRef(activeWorkspaceId);
 
-  // Sync URL ជាមួយ Redux ក្នុងករណី User ប្តូរ Workspace តាម URL ផ្ទាល់
+
   useEffect(() => {
     if (params.workspaceId) {
       const idFromUrl = Number(params.workspaceId);
@@ -174,7 +175,7 @@ export function Sidebar() {
     }
   }, [params.workspaceId, activeWorkspaceId, dispatch]);
 
-  // ប្តូរ Workspace ត្រូវដេញចេញពីទំព័រ Folder ចាស់
+
   useEffect(() => {
     const currentWS = activeWorkspaceId;
     const prevWS = prevWorkspaceIdRef.current;
@@ -186,7 +187,7 @@ export function Sidebar() {
     prevWorkspaceIdRef.current = currentWS;
   }, [activeWorkspaceId, pathname, router]);
 
-  // ១. ទាញយក Folders (នឹងមិនបាត់ទេពេល Refresh ព្រោះ activeWorkspaceId ទាញពី LocalStorage)
+
   const { data: apiFolders } = useGetFoldersByWorkspaceQuery(
     activeWorkspaceId as number,
     { skip: !activeWorkspaceId },
@@ -196,41 +197,44 @@ export function Sidebar() {
     ...section,
     items: section.items.map((item) => {
       if (item.title === "Schema") {
-        const foldersFromApi =
-          apiFolders?.map((folder) => ({
-            id: folder.id,
-            title: folder.name,
-            url: `/workspaces/${activeWorkspaceId}/folders/${folder.id}`,
-            icon: Icons.Folders || Folder,
-          })) || [];
+
+        const authServiceItems =
+          apiFolders
+            ?.filter((folder) => folder.name.toLowerCase() === "auth service")
+            .map((folder) => ({
+              id: folder.id,
+              title: folder.name,
+              url: `/workspaces/${activeWorkspaceId}/folders/${folder.id}`,
+              icon: Icons.Folders || Folder,
+            })) || [];
+
+
+        const otherFoldersFromApi =
+          apiFolders
+            ?.filter((folder) => folder.name.toLowerCase() !== "auth service")
+            .map((folder) => ({
+              id: folder.id,
+              title: folder.name,
+              url: `/workspaces/${activeWorkspaceId}/folders/${folder.id}`,
+              icon: Icons.Folders || Folder,
+            })) || [];
 
         return {
           ...item,
           items: [
-            // ១. បង្កើត Sample Schema ជា Item ដែលមានកូន
+
             {
               id: "sample-schema-parent",
               title: "Sample Schema",
               icon: Icons.Schema || Folder,
-              items: [
-                { id: "s1", title: "M-Banking", url: "#", icon: Icons.Folders },
-                {
-                  id: "s2",
-                  title: "E-Commerce",
-                  url: "#",
-                  icon: Icons.Folders,
-                },
-                {
-                  id: "s3",
-                  title: "E-Learning",
-                  url: "#",
-                  icon: Icons.Folders,
-                },
-              ],
+
+              items: authServiceItems,
             },
-            // ២. Folder ដែលមកពី API
-            ...foldersFromApi,
-            // ៣. ប៊ូតុង Add New Folder
+
+
+            ...otherFoldersFromApi,
+
+
             {
               id: "add-new-folder",
               title: "Add new schema",
@@ -277,10 +281,50 @@ export function Sidebar() {
     setExpandedItems((prev) => (prev.includes(title) ? [] : [title]));
   };
 
-  const handleSignOut = () => {
-    localStorage.removeItem("registered_user");
-    window.location.href = "/login";
-  };
+
+
+   const handleSignOut = async () => {
+      try {
+        const res = await fetch(`/api/logout`, {
+          method: "POST",
+          credentials: "include",
+        });
+  
+        const data = await res.json();
+  
+        if (res.ok) {
+          toast({
+            title: data.message || "Logout Successful!",
+            description: "You have been safely logged out.",
+            variant: "success", // Ensure your toaster supports this variant
+            duration: 3000,
+          });
+  
+          // Redirect and reload
+          router.push(`/`);
+          window.location.reload();
+        } else {
+          // If 400 (Token not found), the user is effectively logged out anyway
+          toast({
+            title: "Session Expired",
+            description: data.message || "Your session was already cleared.",
+            variant: "destructive", // Shadcn default for errors
+            duration: 3000,
+          });
+  
+          // Optional: Redirect anyway since the token is missing/invalid
+          router.push(`/`);
+        }
+      } catch (error) {
+        toast({
+          title: "Connection Error",
+          description: "Failed to reach the server. Please try again.",
+          variant: "destructive",
+          duration: 3000,
+        });
+        console.error("Logout Error:", error);
+      }
+    };
 
   const topNav = dynamicNavData.filter((s) => s.label === "MAIN MENU");
   const bottomNav = dynamicNavData.filter((s) => s.label === "OTHERS");
@@ -305,7 +349,7 @@ export function Sidebar() {
         className={cn(
           "overflow-hidden border-r border-gray-200 bg-white transition-all duration-300 ease-in-out dark:border-gray-800 dark:bg-gray-dark",
           isMobile ? "fixed bottom-0 top-0 z-50" : "sticky top-0 h-screen",
-          // ប្តូរ Width តាមស្ថានភាព
+
           isMobile
             ? isOpen
               ? "w-[280px]"
@@ -332,7 +376,7 @@ export function Sidebar() {
               </div>
             )}
 
-            {/* ប៊ូតុងសម្រាប់បិទបើក Sidebar */}
+
             <button
               onClick={toggleSidebar}
               className="rounded-lg p-2 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -359,8 +403,12 @@ export function Sidebar() {
                           <TooltipTrigger asChild>
                             <div>
                               <MenuItem
-                                as={item.items.length > 0 ? "button" : "link"}
-                                href={item.url || "/"}
+                                as={
+                                  (item.items.length > 0
+                                    ? "button"
+                                    : "link") as "link" | "button"
+                                }
+                                href={item.url ?? "#"}
                                 isActive={
                                   pathname === item.url ||
                                   item.items.some(
@@ -502,14 +550,7 @@ export function Sidebar() {
                                               <FaRegEdit className="size-4" />{" "}
                                               <span>Rename</span>
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="gap-2">
-                                              <IoDuplicateOutline className="size-4" />{" "}
-                                              <span>Duplicate</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem className="gap-2">
-                                              <ShareIcon className="size-4" />{" "}
-                                              <span>Share Folder</span>
-                                            </DropdownMenuItem>
+                                            
                                             <DropdownMenuSeparator />
                                             <DropdownMenuItem
                                               onClick={() => {
@@ -562,14 +603,7 @@ export function Sidebar() {
                                               <FaRegEdit className="size-4" />{" "}
                                               <span>Rename</span>
                                             </ContextMenuItem>
-                                            <ContextMenuItem className="gap-2">
-                                              <IoDuplicateOutline className="size-4" />{" "}
-                                              <span>Duplicate</span>
-                                            </ContextMenuItem>
-                                            <ContextMenuItem className="gap-2">
-                                              <ShareIcon className="size-4" />{" "}
-                                              <span>Share Folder</span>
-                                            </ContextMenuItem>
+                                            
                                           </ContextMenuGroup>
                                           <ContextMenuSeparator />
                                           <ContextMenuItem
@@ -677,60 +711,6 @@ export function Sidebar() {
         onClose={() => setIsOpenWorkspace(false)}
       />
     </TooltipProvider>
-  );
-}
-
-// បង្កើត Component នេះនៅក្រៅ Sidebar ឬខាងលើ Sidebar
-function NavSubItem({ item, pathname }: { item: any; pathname: string }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const hasChildren = item.items && item.items.length > 0;
-  const Icon = item.icon || Folder;
-
-  return (
-    <li className="list-none">
-      <div
-        onClick={() => hasChildren && setIsOpen(!isOpen)}
-        className={cn(
-          "group flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 text-sm transition-all hover:bg-gray-100 dark:hover:bg-gray-800",
-          isOpen && "bg-gray-50 dark:bg-gray-900",
-        )}
-      >
-        <div className="flex items-center space-x-2 text-gray-700 dark:text-gray-300">
-          <Icon className="size-4 shrink-0" />
-          <span className="font-medium">{item.title}</span>
-        </div>
-        {hasChildren && (
-          <ChevronUp
-            className={cn(
-              "size-3 text-gray-400 transition-transform duration-200",
-              !isOpen && "rotate-180",
-            )}
-          />
-        )}
-      </div>
-
-      {/* បង្ហាញកូនជាន់ទី ៣ (M-Banking, E-Commerce...) */}
-      {hasChildren && isOpen && (
-        <ul className="ml-6 mt-1 space-y-1 border-l border-gray-100 pl-2 dark:border-gray-800">
-          {item.items.map((child: any) => (
-            <li key={child.id}>
-              <Link
-                href={child.url}
-                className={cn(
-                  "flex items-center space-x-2 rounded-md px-3 py-2 text-[13px] transition-colors hover:bg-purple-50 hover:text-purple-600 dark:hover:bg-gray-800",
-                  pathname === child.url
-                    ? "bg-purple-50 text-purple-600"
-                    : "text-gray-500",
-                )}
-              >
-                <child.icon className="size-3.5 shrink-0" />
-                <span className="truncate">{child.title}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </li>
   );
 }
 

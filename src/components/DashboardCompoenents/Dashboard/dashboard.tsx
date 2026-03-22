@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation"; // 🎯 សម្រាប់ Next.js
-import CreateSchema from "./CreateSchema"; // 🎯 Import Component Sheet របស់បង
+import { useRouter } from "next/navigation"; 
+import CreateSchema from "./CreateSchema"; 
 import {
   Database,
   FileText,
@@ -22,7 +22,8 @@ import AIGenerateSchema from "./AIGenerateSchema";
 
 export default function Dashboard() {
   const router = useRouter();
-  // 🎯 ទាញ Workspace ID ពិតប្រាកដពី Redux
+  
+  
   const activeWorkspaceId = useSelector(selectActiveWorkspaceId);
 
   const handleNavigation = (path: string) => {
@@ -30,55 +31,21 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen space-y-10 bg-white rounded-lg p-8 font-sans dark:bg-[#0B0F1A]">
+    <div className="min-h-fit space-y-10 bg-white rounded-lg p-8 font-sans dark:bg-[#0B0F1A]">
       {/* --- Header Section --- */}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <div>
           <h1 className="text-2xl font-bold text-slate-700 dark:text-white">
-            Dashboard
+            Generate API
           </h1>
           <p className="mt-1 text-md text-slate-500">
-            Welcome back, Kimla. Here’s what’s happening with your APIs.
+            Welcome back,Here’s what’s happening with your APIs.
           </p>
         </div>
-        <div className="flex gap-3">
-          <button
-            onClick={() => handleNavigation("/settings")}
-            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-          >
-            <Settings size={16} /> Settings
-          </button>
-
-        </div>
+        
       </div>
 
-      {/* --- Stats Overview --- */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard
-          label="Active Schema"
-          value="168"
-          icon={<Database size={18} />}
-          color="orange"
-        />
-        <StatCard
-          label="Uploaded Files"
-          value="0"
-          icon={<FileText size={18} />}
-          color="blue"
-        />
-        <StatCard
-          label="AI Generations"
-          value="24"
-          icon={<Sparkles size={18} />}
-          color="purple"
-        />
-        <StatCard
-          label="Total Resources"
-          value="192"
-          icon={<BarChart3 size={18} />}
-          color="green"
-        />
-      </div>
+    
 
       {/* --- Main Action Cards --- */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -108,7 +75,7 @@ export default function Dashboard() {
           onClick={() => handleNavigation("/dashboard/upload-file")}
         />
 
-        {/* Card 3: AI Generate (ប្តូរមកប្រើ AIGenerateSchema Sheet វិញ) */}
+
         <AIGenerateSchema workspaceId={activeWorkspaceId || 0} folderId={0}>
           <div className="group flex h-full cursor-pointer flex-col rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-all hover:border-purple-200 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
             <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-purple-600 shadow-lg shadow-purple-100 dark:shadow-none">
@@ -138,7 +105,7 @@ export default function Dashboard() {
   );
 }
 
-// --- កែសម្រួល ActionCard ឱ្យទទួល onClick ---
+
 function ActionCard({
   title,
   description,
@@ -175,24 +142,3 @@ function ActionCard({
   );
 }
 
-function StatCard({ label, value, icon, color }: any) {
-  const colorMap: any = {
-    orange: "text-orange-600 bg-orange-50",
-    blue: "text-blue-600 bg-blue-50",
-    purple: "text-purple-600 bg-purple-50",
-    green: "text-green-600 bg-green-50",
-  };
-  return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-3 flex items-center gap-3">
-        <div className={`rounded-lg p-2 ${colorMap[color]}`}>{icon}</div>
-        <p className="text-xs font-bold uppercase tracking-tight text-slate-500">
-          {label}
-        </p>
-      </div>
-      <h4 className="text-2xl font-bold text-slate-900 dark:text-white">
-        {value}
-      </h4>
-    </div>
-  );
-}

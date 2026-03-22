@@ -31,7 +31,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/DashboardCompoenents/ui/dropdown-menu"; // 👈 ត្រូវតែមានពាក្យ -menu បែបនេះ
 
-
 interface CollaboratorsViewProps {
   schema: any;
 }
@@ -147,22 +146,13 @@ export default function CollaboratorsView({ schema }: CollaboratorsViewProps) {
   );
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6 duration-500 animate-in fade-in">
+    <div className="mx-auto max-w-7xl space-y-6 duration-500 animate-in fade-in">
       {/* Header Section */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-medium text-slate-700">
           Collaborators and teams
         </h2>
-        <button
-          onClick={handleToggleVisibility}
-          disabled={isUpdatingVisibility}
-          className="flex items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium shadow-sm transition-colors hover:bg-slate-50"
-        >
-          {isUpdatingVisibility && (
-            <Loader2 className="size-3 animate-spin text-purple-600" />
-          )}
-          Manage visibility
-        </button>
+        
       </div>
 
       {/* Info Card - Repository Status */}
@@ -298,29 +288,32 @@ export default function CollaboratorsView({ schema }: CollaboratorsViewProps) {
                       {/* 🎯 Change Role Dropdown (ជិតប៊ូតុងលុប) */}
                       {!isOwner && !isPending && (
                         <DropdownMenu>
-  {/* ១. Trigger: ប៊ូតុងសម្រាប់ចុចបើក */}
-  <DropdownMenuTrigger asChild>
-    <button className="flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-[13px] font-medium text-slate-600 transition-all hover:text-slate-900 outline-none">
-      <span className="capitalize">
-        {user.role.toLowerCase()}
-      </span>
-      <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
-    </button>
-  </DropdownMenuTrigger>
+                          {/* ១. Trigger: ប៊ូតុងសម្រាប់ចុចបើក */}
+                          <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-[13px] font-medium text-slate-600 outline-none transition-all hover:text-slate-900">
+                              <span className="capitalize">
+                                {user.role.toLowerCase()}
+                              </span>
+                              <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
+                            </button>
+                          </DropdownMenuTrigger>
 
-  {/* ២. Content: បញ្ជី Role សម្រាប់រើស */}
-  <DropdownMenuContent align="end" className="w-32 bg-white shadow-md border border-slate-200">
-    {["ADMIN", "EDITOR", "VIEWER"].map((r) => (
-      <DropdownMenuItem
-        key={r}
-        onSelect={() => handleRoleChange(user.id, r)}
-        className="cursor-pointer capitalize text-slate-600 focus:bg-slate-50 focus:text-purple-600"
-      >
-        {r.toLowerCase()}
-      </DropdownMenuItem>
-    ))}
-  </DropdownMenuContent>
-</DropdownMenu>
+                          {/* ២. Content: បញ្ជី Role សម្រាប់រើស */}
+                          <DropdownMenuContent
+                            align="end"
+                            className="w-32 border border-slate-200 bg-white shadow-md"
+                          >
+                            {["ADMIN", "EDITOR", "VIEWER"].map((r) => (
+                              <DropdownMenuItem
+                                key={r}
+                                onSelect={() => handleRoleChange(user.id, r)}
+                                className="cursor-pointer capitalize text-slate-600 focus:bg-slate-50 focus:text-purple-600"
+                              >
+                                {r.toLowerCase()}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       )}
 
                       {/* 🎯 Action Buttons (Revoke/Delete) */}
@@ -337,7 +330,7 @@ export default function CollaboratorsView({ schema }: CollaboratorsViewProps) {
                         !isOwner && (
                           <button
                             onClick={() => handleRemoveUser(user.id, user.name)}
-                            className="rounded-md bg-red-50 p-2 text-red-600  "
+                            className="rounded-md bg-red-50 p-2 text-red-600"
                           >
                             <Trash2 className="h-4 w-4" />
                           </button>
@@ -356,31 +349,7 @@ export default function CollaboratorsView({ schema }: CollaboratorsViewProps) {
             )}
           </div>
 
-          {/* Organization Promo Section */}
-          <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/30 p-6">
-            <div className="flex gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg border border-purple-100 bg-purple-50 text-purple-600 shadow-sm">
-                <Users className="h-6 w-6" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-slate-900">
-                  Get team access controls and discussions for your contributors
-                  in an organization.
-                </p>
-                <div className="flex items-center gap-2">
-                  <span className="rounded border border-orange-200 bg-orange-100 px-1.5 py-0.5 text-[10px] font-bold uppercase text-orange-700">
-                    New
-                  </span>
-                  <p className="text-xs text-slate-500">
-                    Private repos and unlimited members are free.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <button className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold shadow-sm transition-colors hover:bg-slate-50">
-              Create an organization
-            </button>
-          </div>
+          
         </div>
       </div>
 
@@ -391,15 +360,7 @@ export default function CollaboratorsView({ schema }: CollaboratorsViewProps) {
         workspaceId={activeWorkspaceId as number}
       />
 
-      {/* Pagination Footer */}
-      <div className="flex items-center justify-center gap-4 text-sm font-medium text-slate-600">
-        <button className="flex items-center gap-1 hover:text-purple-600 disabled:opacity-50">
-          <span className="text-lg">‹</span> Previous
-        </button>
-        <button className="flex items-center gap-1 hover:text-purple-600">
-          Next <span className="text-lg">›</span>
-        </button>
-      </div>
+      
     </div>
   );
 }

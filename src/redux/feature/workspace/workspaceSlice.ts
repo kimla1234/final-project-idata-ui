@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "@/redux/store";
 
-// មុខងារជំនួយសម្រាប់ទាញទិន្នន័យពី LocalStorage (ទប់ស្កាត់ Error ពេល SSR)
+
+
+
 const getSavedWorkspace = () => {
   if (typeof window !== "undefined") {
     const saved = localStorage.getItem("activeWorkspace");
@@ -21,6 +23,7 @@ const initialState: WorkspaceStateType = {
   activeWorkspaceId: savedData ? savedData.id : null,
   activeWorkspaceName: savedData ? savedData.name : null,
 };
+
 
 const workspaceSlice = createSlice({
   name: "workspace",

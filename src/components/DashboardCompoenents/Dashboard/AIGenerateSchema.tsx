@@ -28,7 +28,7 @@ import {
 } from "@/redux/service/apiScheme";
 import { useGetFoldersByWorkspaceQuery } from "@/redux/service/folder";
 
-// Import JSON View មិនឱ្យទាស់ជាមួយ Server Side Rendering
+
 const ReactJson = dynamic(() => import("@microlink/react-json-view"), {
   ssr: false,
   loading: () => (
@@ -62,14 +62,14 @@ export default function AIGenerateSchema({
   const [createApiScheme, { isLoading: isSaving }] = useCreateApiSchemeMutation();
   const [generateFromPrompt, { isLoading: isGenerating }] = useGenerateSchemaFromPromptMutation();
 
-  // Auto-scroll ទៅក្រោមពេលមាន Chat ថ្មី
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [aiResponse, isGenerating, isAskingForFolder]);
 
-  // 🎯 ១. Logic ហៅទៅ AI
+
   const handleAskAI = async () => {
     if (!prompt.trim() || isGenerating) return;
 
@@ -77,7 +77,7 @@ export default function AIGenerateSchema({
     setHistoryPrompt(currentPrompt);
     setPrompt("");
     setAiResponse(null);
-    setIsAskingForFolder(false); // Reset ការសួររក Folder
+    setIsAskingForFolder(false); 
 
     try {
       const result = await generateFromPrompt({ prompt: currentPrompt }).unwrap();
@@ -95,14 +95,14 @@ export default function AIGenerateSchema({
     }
   };
 
-  // 🎯 ២. Logic Save ចូល Database
+
   const handleSaveSchema = async (selectedFolderId?: number) => {
     if (!aiResponse) return;
 
-    // ប្រើ selectedFolderId បើ User រើសក្នុង Chat បើអត់ទេប្រើ folderId ពី Props
+
     const finalFolderId = selectedFolderId || folderId;
 
-    // បើនៅតែអត់មាន Folder ID (ស្មើ 0 ឬ null) ត្រូវឱ្យ AI សួររក Folder
+
     if (!finalFolderId || finalFolderId === 0) {
       setIsAskingForFolder(true);
       return;
@@ -114,7 +114,7 @@ export default function AIGenerateSchema({
         endpointUrl: aiResponse.endpointUrl || "new-api",
         description: aiResponse.description || historyPrompt,
         properties: aiResponse.properties || [],
-        // Map Keys ឱ្យត្រូវ format DTO
+        // Map Keysformat DTO
         keys: Array.isArray(aiResponse.keys)
           ? aiResponse.keys.map((k: any) => ({
               columnName: k.columnName || k.fieldName,

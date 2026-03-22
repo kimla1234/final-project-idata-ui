@@ -103,7 +103,7 @@ export const workspaceApi = normPlovApi.injectEndpoints({
         method: "DELETE",
         params: { email }, // បញ្ជូន email ជា query string (?email=...)
       }),
-      invalidatesTags: ["Members"], // បញ្ជាឱ្យវាទាញបញ្ជីសមាជិកថ្មីភ្លាមៗក្រោយលុប
+      invalidatesTags: ["Workspaces", "Members"], // បញ្ជាឱ្យវាទាញបញ្ជីសមាជិកថ្មីភ្លាមៗក្រោយលុប
     }),
   }),
   overrideExisting: true,

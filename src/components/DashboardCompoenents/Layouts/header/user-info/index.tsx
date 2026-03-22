@@ -13,8 +13,10 @@ import { useState } from "react";
 import { LogOutIcon, SettingsIcon, UserIcon } from "./icons";
 import { useRouter } from "next/navigation";
 import { ConfirmModal } from "@/components/DashboardCompoenents/ui/ConfirmModal";
-import { useGetOrganizerQuery } from "@/redux/service/organizer";
+
 import { useGetUserQuery } from "@/redux/service/user";
+import { RiUserCommunityLine } from "react-icons/ri";
+import { toast } from "@/hooks/use-toast";
 // Import the new hook (ensure path is correct)
 
 
@@ -27,9 +29,47 @@ export function UserInfo() {
   const { data: user, isLoading, error } = useGetUserQuery();
 
   // 2. Handle Logout Logic
-  const handleLogout = () => {
-    localStorage.removeItem("user_session"); 
-    router.push("/login");
+  const handleLogout = async () => {
+    try {
+      const res = await fetch(`/api/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        toast({
+          title: data.message || "Logout Successful!",
+          description: "You have been safely logged out.",
+          variant: "success", // Ensure your toaster supports this variant
+          duration: 3000,
+        });
+
+        // Redirect and reload
+        router.push(`/`);
+        window.location.reload();
+      } else {
+        // If 400 (Token not found), the user is effectively logged out anyway
+        toast({
+          title: "Session Expired",
+          description: data.message || "Your session was already cleared.",
+          variant: "destructive", // Shadcn default for errors
+          duration: 3000,
+        });
+
+        // Optional: Redirect anyway since the token is missing/invalid
+        router.push(`/`);
+      }
+    } catch (error) {
+      toast({
+        title: "Connection Error",
+        description: "Failed to reach the server. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+      console.error("Logout Error:", error);
+    }
   };
 
   // 3. Loading & Error States
@@ -43,7 +83,7 @@ export function UserInfo() {
           <Image
             unoptimized
             // Updated to use logoImage from your JSON
-            src={user?.profileImage || "/images/user/user-03.png"}
+            src={user?.profileImage || "/placeholder.png"}
             className="size-9 rounded-full border-[1.5px] border-primary object-cover"
             alt={`Avatar of ${user.name}`}
             width={42}
@@ -89,12 +129,12 @@ export function UserInfo() {
           </Link>
 
           <Link
-            href="/setting?tab=company"
+            href="/community"
             onClick={() => setIsOpen(false)}
             className="flex items-center gap-2.5 rounded-lg px-2.5 py-[9px] hover:bg-gray-2 dark:hover:bg-dark-3"
           >
-            <SettingsIcon />
-            <span className="font-medium">Account Settings</span>
+            <RiUserCommunityLine className="h-7 h-7 text-xl"/>
+            <span className="font-medium">Back Communitry</span>
           </Link>
 
           <button

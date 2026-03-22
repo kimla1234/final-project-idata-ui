@@ -25,13 +25,15 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
   const params = useParams();
-const activeWorkspaceId = useSelector(selectActiveWorkspaceId);
+  const activeWorkspaceId = useSelector(selectActiveWorkspaceId);
 
-const workspaceIdFromUrl = params.workspaceId || params.id; 
+  const workspaceIdFromUrl = params.workspaceId || params.id;
 
-const finalWorkspaceId = activeWorkspaceId || (workspaceIdFromUrl ? Number(workspaceIdFromUrl) : null);
+  const finalWorkspaceId =
+    activeWorkspaceId ||
+    (workspaceIdFromUrl ? Number(workspaceIdFromUrl) : null);
 
-console.log("💎 Final Workspace ID to Dialog:", finalWorkspaceId); // Debug មើលត្រង់នេះ
+  console.log("💎 Final Workspace ID to Dialog:", finalWorkspaceId); 
 
   return (
     <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stroke bg-white px-4 py-1.5 dark:border-stroke-dark dark:bg-gray-dark md:px-5 2xl:px-10">
@@ -55,36 +57,37 @@ console.log("💎 Final Workspace ID to Dialog:", finalWorkspaceId); // Debug �
         </Link>
       )}
 
-      <div className="max-xl:hidden ">
-        <div className=" text-heading-6 text-dark dark:text-white">
+      <div className="">
+        <div className="text-heading-6 text-dark dark:text-white">
           <WorkspaceSelector />
         </div>
       </div>
-
+      {/*
       <div className="flex w-full justify-center py-1">
-          {/* Use a button here for the click trigger */}
-          <button 
-            onClick={() => setIsSearchOpen(true)}
-            className="flex w-[300px]  items-center gap-2 bg-purple-50 border px-2 py-1.5 rounded-md hover:bg-purple-100 transition-colors text-gray-500"
-          >
-            <ImSearch />
-            <span className="text-[15px]">Search ...</span>
-          </button>
-        </div>
+        {/* Use a button here for the click trigger 
+        <button
+          onClick={() => setIsSearchOpen(true)}
+          className="flex w-[300px] items-center gap-2 rounded-md border bg-purple-50 px-2 py-1.5 text-gray-500 transition-colors hover:bg-purple-100"
+        >
+          <ImSearch />
+          <span className="text-[15px]">Search ...</span>
+        </button>
+      </div>
+      */}
 
-      <div className="flex flex-1 items-center  justify-end  text-[15px] min-[375px]:gap-2">
+      <div className="flex flex-1 items-center justify-end text-[15px] min-[375px]:gap-2">
         <div className="flex space-x-4">
           <div>
             <AvatarGroupCountExample />
           </div>
           <button
             onClick={() => setIsInviteOpen(true)}
-            className="flex items-center gap-2 rounded-md  bg-purple-600 p-2 text-[15px] leading-none  font-semibold text-white transition-all hover:bg-purple-700 hover:shadow-md "
+            className="flex items-center gap-2 rounded-md bg-purple-600 p-2 text-[15px] font-semibold leading-none text-white transition-all hover:bg-purple-700 hover:shadow-md"
           >
-            <MdGroupAdd className="text-lg  " />
-            <span className="max-sm:hidden ">Invite</span>
+            <MdGroupAdd className="text-lg" />
+            <span className="max-sm:hidden">Invite</span>
           </button>
-          <Notification />
+         {/*<Notification /> */} 
         </div>
 
         <div className="shrink-0">
@@ -92,13 +95,13 @@ console.log("💎 Final Workspace ID to Dialog:", finalWorkspaceId); // Debug �
         </div>
       </div>
       {/* ADD THIS LINE HERE */}
-      <SearchDialog 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)} 
+      <SearchDialog
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
       />
       <InviteMemberDialog
-        isOpen={isInviteOpen} 
-        onClose={() => setIsInviteOpen(false)} 
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
         workspaceId={finalWorkspaceId ?? undefined}
       />
     </header>

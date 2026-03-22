@@ -1,200 +1,213 @@
 "use client";
 
-import { mockUser } from "@/data/mockUser";
 import { useToast } from "@/hooks/use-toast";
+import { useGetUserQuery, usePostImageMutation, useUpdateProfileUserMutation } from "@/redux/service/user";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { HiOutlinePhoto } from "react-icons/hi2";
-import { set, get } from "idb-keyval";
-interface User {
-  fullName: string;
-  phoneNumber: string;
-  email: string;
-  bio: string;
-  language: string;
-  photo: string | null;
-}
 
 export default function Account() {
-  const [user, setUser] = useState<User | null>(null);
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const { toast } = useToast();
-
-useEffect(() => {
-  const loadUserData = async () => {
-    const savedUser = await get("registered_user");
-
-    if (savedUser) {
-      setUser(savedUser);
-    } else {
-      setUser(mockUser);
-    }
-  };
-
-  loadUserData();
-}, []);
-
-
   
+  // 🎯 1. Fetch User Data from API
+  const { data: userProfile, isLoading } = useGetUserQuery();
+  const [updateProfile, { isLoading: isUpdating }] = useUpdateProfileUserMutation();
+  const [postImage, { isLoading: isUploading }] = usePostImageMutation();
 
-  // Photo upload preview
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || !e.target.files[0]) return;
+  // Local state for form handling
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    profileImage: ""
+  });
+
+  // 🎯 2. Sync API data to local state when loaded
+  useEffect(() => {
+    if (userProfile) {
+      setFormData({
+        name: userProfile.name || "",
+        phone: userProfile.phone || "",
+        address: userProfile.address || "",
+        profileImage: userProfile.profileImage || ""
+      });
+    }
+  }, [userProfile]);
+
+
+ //  Handle Photo Upload (Flow: Upload -> Get URI -> Patch Profile Immediately)
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0] || !userProfile?.uuid) return;
+    
     const file = e.target.files[0];
 
-    // 1. Simple Guard: Reject if file is > 1MB (Base64 will make it ~1.3MB)
-    if (file.size > 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Please select an image smaller than 1MB.",
-        variant: "destructive",
-      });
+    // ១. ឆែកទំហំរូបភាព (២MB ខ្លាច Server Error)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: "File too large", description: "Max size is 2MB", variant: "destructive" });
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result as string;
-      setPhotoPreview(base64);
-      setUser((prev) => (prev ? { ...prev, photo: base64 } : prev));
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Generic change handler
-  const handleChange = (field: keyof User, value: string) => {
-    setUser((prev) => (prev ? { ...prev, [field]: value } : prev));
-  };
-
-  // Inside your Account component's handleSave function:
-  const handleSave = async () => {
-    if (!user) return;
+    const body = new FormData();
+    body.append("file", file);
 
     try {
-      // SAVE EVERYTHING TO INDEXEDDB (No 5MB limit issue)
-      await set("registered_user", user);
+      // --- STEP 1: Upload រូបភាពទៅកាន់ Server ---
+      const uploadRes = await postImage(body).unwrap();
+      
+      // ទាញយក URI/URL មកវិញ (ឆែកតាម Response Backend របស់បង)
+      const imageUri = uploadRes?.uri || uploadRes?.payload;
 
-      // SAVE ONLY ESSENTIAL DATA TO LOCALSTORAGE
-      // We remove the photo from the session object to keep it tiny
-      const { photo, ...sessionData } = user;
-      localStorage.setItem(
-        "user_session",
-        JSON.stringify({ ...sessionData, isLoggedIn: true }),
-      );
+      if (imageUri) {
+        // --- STEP 2: Update ចូល Database ភ្លាមៗ (ដូច MyProfile) ---
+        await updateProfile({
+          uuid: userProfile.uuid,
+          user: { profileImage: imageUri } // Patch តែ field រូបភាពមួយក៏បាន
+        }).unwrap();
 
-      // Trigger update for other components
-      window.dispatchEvent(new Event("local-storage-update"));
+        // --- STEP 3: Update Local State ដើម្បីបង្ហាញរូបថ្មី ---
+        setFormData((prev) => ({ ...prev, profileImage: imageUri }));
+        
+        toast({ 
+          title: "Profile Picture Updated", 
+          description: "Your photo has been saved successfully.",
+          className: "bg-green-600 text-white" 
+        });
+      }
+    } catch (error) {
+      console.error("Upload Error:", error);
+      toast({ title: "Update Failed", description: "Could not update profile picture.", variant: "destructive" });
+    }
+  };
+
+  // 🎯 4. Save Profile Changes
+  const handleSave = async () => {
+    if (!userProfile?.uuid) return;
+
+    try {
+      await updateProfile({
+        uuid: userProfile.uuid,
+        user: {
+          name: formData.name,
+          phone: formData.phone,
+          address: formData.address,
+          profileImage: formData.profileImage
+        }
+      }).unwrap();
 
       toast({
-        title: "Profile Updated",
-        description: "Your changes have been saved to IndexedDB.",
+        title: "Success",
+        description: "Your profile has been updated successfully.",
         className: "bg-green-600 text-white",
       });
     } catch (error) {
-      toast({
-        title: "Save Failed",
-        description: "Could not save profile data.",
-        variant: "destructive",
+      toast({ 
+        title: "Update Failed", 
+        description: "Something went wrong while saving.", 
+        variant: "destructive" 
       });
     }
   };
 
-  if (!user) return <p>Loading...</p>;
+  if (isLoading) return <p className="p-10 text-center text-gray-500">Loading profile...</p>;
 
   return (
-    <div className="mx-auto w-full rounded-md bg-white">
-      <h2 className="mb-2 text-xl font-semibold">Profile Information</h2>
-      <p className="mb-10 text-gray-500">
-        Update your personal information and preferences
-      </p>
+    <div className="mx-auto w-full rounded-md bg-white p-6 shadow-sm">
+      <h2 className="mb-2 text-xl font-semibold text-gray-800">Profile Information</h2>
+      <p className="mb-10 text-gray-500">Update your personal details and preferences.</p>
 
-      {/* Avatar */}
+      {/* Avatar Section */}
       <div className="mb-6 flex items-center space-x-5">
-        <Image
-          width={96}
-          height={96}
-          src={photoPreview || user.photo || "/images/user/user-03.png"}
-          alt="Profile"
-          className="h-24 w-24 rounded-full object-cover"
-        />
+        <div className="relative h-24 w-24 overflow-hidden rounded-full border border-gray-100">
+          <Image
+            fill
+            src={formData.profileImage || "/placeholder.png"}
+            alt="Profile"
+            className="object-cover"
+          />
+          {isUploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-[10px] text-white">
+              Uploading...
+            </div>
+          )}
+        </div>
 
         <div>
-          <label className="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 text-gray-700 hover:bg-gray-200">
+          <label className="flex cursor-pointer items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all">
             <HiOutlinePhoto className="text-xl" />
-            Upload Photo
+            Change Photo
             <input
               type="file"
-              accept="image/png, image/jpeg"
+              accept="image/*"
               onChange={handlePhotoUpload}
               className="hidden"
+              disabled={isUploading}
             />
           </label>
-          <p className="mt-1 text-sm text-gray-400">JPG, PNG up to 2MB</p>
         </div>
       </div>
 
-      {/* Form */}
-      <div className="flex w-full space-x-10">
-        <div className="w-full">
+      {/* Form Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="space-y-4">
           <Input
             label="Full Name"
-            value={user.fullName}
-            onChange={(v) => handleChange("fullName", v)}
+            value={formData.name}
+            placeholder="Enter your name"
+            onChange={(v) => setFormData(prev => ({ ...prev, name: v }))}
           />
-
-          <Input
-            label="Email"
-            value={user.email}
-            onChange={(v) => handleChange("email", v)}
-          />
-
           <Input
             label="Phone Number"
-            value={user.phoneNumber}
-            onChange={(v) => handleChange("phoneNumber", v)}
+            value={formData.phone}
+            placeholder="e.g. 012345678"
+            onChange={(v) => setFormData(prev => ({ ...prev, phone: v }))}
           />
+          <div className="mb-4">
+            <label className="mb-1 block text-sm font-medium text-gray-700">Email (Read-only)</label>
+            <input
+              type="text"
+              value={userProfile?.email || ""}
+              disabled
+              className="w-full rounded border border-gray-200 bg-gray-50 px-3 py-2 text-gray-400 cursor-not-allowed"
+            />
+          </div>
         </div>
 
-        <div className="w-full">
-          <label className="mb-1 block text-gray-700">Bio</label>
+        <div className="space-y-4">
+          <label className="mb-1 block text-sm font-medium text-gray-700">Address / Bio</label>
           <textarea
-            value={user.bio}
-            onChange={(e) => handleChange("bio", e.target.value)}
-            className="min-h-[125px] w-full rounded bg-slate-100 px-3 py-2"
+            value={formData.address}
+            onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+            className="min-h-[162px] w-full rounded border border-gray-200 bg-white px-3 py-2 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
+            placeholder="Tell us about yourself or your location..."
           />
         </div>
       </div>
 
-      <div className="mt-6 flex justify-end">
+      {/* Action Buttons */}
+      <div className="mt-8 flex justify-end">
         <button
           onClick={handleSave}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+          disabled={isUpdating}
+          className="rounded-lg bg-purple-600 px-8 py-2.5 text-white font-medium hover:bg-purple-700 disabled:bg-purple-300 transition-colors shadow-md"
         >
-          Save Changes
+          {isUpdating ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </div>
   );
 }
 
-/* ---------- Reusable Input ---------- */
-function Input({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-}) {
+/* ---------- Reusable Input Component ---------- */
+function Input({ label, value, placeholder, onChange }: { label: string; value: string; placeholder?: string; onChange: (v: string) => void }) {
   return (
     <div className="mb-4">
-      <label className="mb-1 block text-gray-700">{label}</label>
+      <label className="mb-1 block text-sm font-medium text-gray-700">{label}</label>
       <input
         type="text"
         value={value}
+        placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded bg-slate-100 px-3 py-2"
+        className="w-full rounded border border-gray-200 bg-white px-3 py-2 focus:ring-2 focus:ring-purple-500 outline-none transition-all"
       />
     </div>
   );

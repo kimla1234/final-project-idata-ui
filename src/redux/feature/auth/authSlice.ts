@@ -2,12 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "@/redux/store";
 
 type initialStateType = {
-  token: string | null; // assuming token is string for simplicity
+  token: string | null; 
   isAuthenticated: boolean;
   user: UserType;
 };
 
-// បង្កើត Type សម្រាប់ User
 type UserType = {
   email: string;
   name?: string;
@@ -28,9 +27,10 @@ const authSlice = createSlice({
     setAccessToken(state, action: PayloadAction<string>) {
       console.log("AuthSlice Access Token Set in Redux:", action.payload); // Log token
       state.token = action.payload;
+      state.isAuthenticated = true;
 
     },
-    // 🎯 បង្កើត reducer សម្រាប់រក្សាទុកព័ត៌មាន User ពេល Login
+
     setUser(state, action: PayloadAction<UserType>) {
       state.user = action.payload;
     },

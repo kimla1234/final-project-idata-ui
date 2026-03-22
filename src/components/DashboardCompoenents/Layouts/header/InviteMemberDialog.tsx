@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FaLink } from "react-icons/fa6";
 import { useSelector } from "react-redux";
-import { selectCurrentUser, selectToken } from "@/redux/feature/auth/authSlice"; // 🎯 ទាញ Email ពី Auth Slice
+import { selectCurrentUser, selectToken } from "@/redux/feature/auth/authSlice"; 
 
 import {
   DropdownMenu,
@@ -41,7 +41,7 @@ export function InviteMemberDialog({
     if (token) {
       try {
         const decoded: any = jwtDecode(token);
-        return decoded.sub; // ឬ decoded.email ទៅតាមអ្វីដែល Backend បោះមកក្នុង Token
+        return decoded.sub; 
       } catch (e) {
         return null;
       }
@@ -49,7 +49,7 @@ export function InviteMemberDialog({
     return null;
   }, [token]);
 
-  // ១. ទាញបញ្ជីសមាជិក (Backend ត្រូវផ្ញើទាំង Member និង Invitation ដែលមានពាក្យ PENDING មកជាមួយ)
+
   const { data: members = [], isLoading: isFetching } =
     useGetWorkspaceMembersQuery(workspaceId as number, {
       skip: !workspaceId || !isOpen,
@@ -59,13 +59,13 @@ export function InviteMemberDialog({
   const [updateMemberRole, { isLoading: isUpdating }] =
     useUpdateMemberRoleMutation();
 
-  // ២. រកមើល Role របស់ខ្លួនឯងក្នុងចំណោម Members (ប្រើ Email ជាសោរ)
+
   const currentUserInWorkspace = useMemo(() => {
     if (!userEmail || members.length === 0) return null;
     return members.find((m: any) => m.email === userEmail);
   }, [members, userEmail]);
 
-  // ៣. កំណត់សិទ្ធិ Manage (Owner ឬ Admin)
+
   const isOwner = currentUserInWorkspace?.role === "OWNER";
   const isAdmin = currentUserInWorkspace?.role === "ADMIN";
   const canManage = isOwner || isAdmin;
@@ -219,7 +219,7 @@ export function InviteMemberDialog({
                 const displayRole = member.role.replace(" (PENDING)", "");
                 const isTargetOwner = member.role === "OWNER";
 
-                // លក្ខខណ្ឌ Disable ដូរ Role
+
                 const isDisabled =
                   !canManage || isTargetOwner || (isAdmin && isSelf) || isPending;
 
@@ -260,7 +260,7 @@ export function InviteMemberDialog({
 
                     <div className="flex items-center gap-2">
                       {isPending && canManage ? (
-                        /* 🎯 ប៊ូតុង Revoke សម្រាប់ Pending Invite */
+                        
                         <button 
                         disabled={isRevoking}
                           className="text-[12px] font-medium text-red-500 hover:bg-red-50 px-2 py-1 rounded transition-colors"
@@ -269,7 +269,7 @@ export function InviteMemberDialog({
                          {isRevoking ? "..." : "Revoke"}
                         </button>
                       ) : (
-                        /* Dropdown ប្តូរ Role ធម្មតា */
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild disabled={isDisabled}>
                             <button className="flex items-center gap-1 text-[13px] font-medium text-gray-600 disabled:opacity-50">

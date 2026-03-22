@@ -87,7 +87,7 @@ export function UserInfo({ user: propUser }: UserInfoProps) {
     }
   };
 
-  // ប្រើ propUser ផ្ទាល់ ដើម្បីឱ្យវា Update តាម NavbarComponent
+
   const user = propUser;
 
   const avatarSrc =
@@ -107,7 +107,7 @@ export function UserInfo({ user: propUser }: UserInfoProps) {
           <Image
             unoptimized
             // Use user?.profileImage which now matches the mappedUser key
-            src={user?.profileImage || "/logo.png"}
+            src={user?.profileImage || "/placeholder.png"}
             width={44}
             height={44}
             className="h-11 w-11 rounded-full border-2 border-purple-600 object-cover"
@@ -148,8 +148,8 @@ export function UserInfo({ user: propUser }: UserInfoProps) {
           {/* View Profile */}
           <DropdownMenuItem
             onSelect={() => {
-              setIsOpen(false); // បិទ Dropdown ពេលចុច
-              router.push("/profile"); // ទៅកាន់ទំព័រ Profile
+              setIsOpen(false); 
+              router.push("/setting?tab=account"); 
             }}
             className="p-0 focus:bg-transparent"
           >
@@ -166,8 +166,8 @@ export function UserInfo({ user: propUser }: UserInfoProps) {
           {/* Settings */}
           <DropdownMenuItem
             onSelect={() => {
-              setIsOpen(false); // បិទ Dropdown ពេលចុច
-              router.push("/dashboard"); // ទៅកាន់ទំព័រ Profile
+              setIsOpen(false); 
+              router.push("/dashboard"); 
             }}
             className="p-0 focus:bg-transparent"
           >

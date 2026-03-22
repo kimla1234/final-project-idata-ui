@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { IoCloseSharp } from "react-icons/io5";
+import { Mail, Timer, RefreshCcw } from "lucide-react"; // Added for better UI
 import Button from "./ButtonComponentForAuth";
 import {
   useVerifyCodeRegisterMutation,
@@ -26,7 +27,6 @@ function OTPComponent() {
   const { toast } = useToast();
   const router = useRouter();
 
-  // Retrieve email logic
   useEffect(() => {
     if (emailFromRedux) {
       setEmail(emailFromRedux);
@@ -37,19 +37,16 @@ function OTPComponent() {
         setEmail(savedEmail);
       } else {
         toast({
-          title: "រកមិនឃើញអ៉ីម៉ែល",
-          description: "សូមចុះឈ្មោះម្ដងទៀត។",
+          title: "Email Not Found",
+          description: "Please register again to continue.",
           variant: "destructive",
           duration: 3000,
         });
-        setTimeout(() => {
-          router.push(`/register`);
-        }, 3000);
+        setTimeout(() => router.push(`/register`), 3000);
       }
     }
-  }, [emailFromRedux, router]);
+  }, [emailFromRedux, router, toast]);
 
-  // Timer logic
   useEffect(() => {
     let countdown: NodeJS.Timeout;
     if (timer > 0) {
@@ -58,19 +55,15 @@ function OTPComponent() {
     return () => clearTimeout(countdown);
   }, [timer]);
 
-  const handleOTPComplete = (otpValue: string) => {
-    setOtp(otpValue);
-  };
+  const handleOTPComplete = (otpValue: string) => setOtp(otpValue);
 
   const handleSubmit = async () => {
-    console.log("Sending to Backend:", { email, verificationCode: otp });
-
     if (!email) return;
     const cleanOtp = otp.trim();
     if (cleanOtp.length < 6) {
       toast({
-        title: "សូមបញ្ចូលលេខកូដ",
-        description: "លេខកូដផ្ទៀងផ្ទាត់ត្រូវមាន ៦ ខ្ទង់",
+        title: "Incomplete Code",
+        description: "Please enter the full 6-digit verification code.",
         variant: "destructive",
       });
       return;
@@ -78,32 +71,24 @@ function OTPComponent() {
 
     setIsLoading(true);
     try {
-      // Added await here to ensure we wait for the server response
       await verifyCodeRegister({
-  email: email,
-  verificationCode: cleanOtp,
-}).unwrap();
+        email: email,
+        verificationCode: cleanOtp,
+      }).unwrap();
 
       toast({
-        title: "ផ្ទៀងផ្ទាត់ជោគជ័យ!",
-        description: "គណនីរបស់អ្នកត្រូវបានបង្កើត។",
+        title: "Verification Successful!",
+        description: "Your account has been created. Redirecting to login...",
         variant: "success",
         duration: 3000,
       });
 
       localStorage.removeItem("verificationEmail");
-
-      setTimeout(() => {
-        router.push(`/login`);
-      }, 2000);
+      setTimeout(() => router.push(`/login`), 2000);
     } catch (error: any) {
-      //console.error("Verification Error:", error);
       toast({
-        title: "ការផ្ទៀងផ្ទាត់បរាជ័យ",
-        description:
-          error?.data?.message ||
-          error?.response?.data?.message ||
-          "លេខកូដមិនត្រឹមត្រូវ ឬហួសសុពលភាព។",
+        title: "Verification Failed",
+        description: error?.data?.message || "Invalid or expired code.",
         variant: "destructive",
         duration: 3000,
       });
@@ -114,23 +99,20 @@ function OTPComponent() {
 
   const handleResendCode = async () => {
     if (!email) return;
-
     setResending(true);
     try {
-      // Added await here
       await resendCode({ email }).unwrap();
       toast({
-        title: "ផ្ញើលេខកូដសារជាថ្មីជោគជ័យ",
-        description: "សូមពិនិត្យមើលប្រអប់សំបុត្រអ៉ីម៉ែលរបស់អ្នក។",
+        title: "Code Resent",
+        description: "Please check your email inbox for the new code.",
         variant: "success",
         duration: 3000,
       });
-
-      setTimer(90); // Reset timer
+      setTimer(90);
     } catch (error) {
       toast({
-        title: "មិនអាចផ្ញើលេខកូដបានទេ",
-        description: "សូមព្យាយាមម្ដងទៀតនៅពេលបន្តិចទៀតនេះ។",
+        title: "Request Failed",
+        description: "Unable to resend code. Please try again later.",
         variant: "destructive",
         duration: 3000,
       });
@@ -140,61 +122,80 @@ function OTPComponent() {
   };
 
   return (
-    <section className="flex h-screen w-full items-center justify-center bg-gray-50">
-      <div className="m-auto rounded-xl border border-slate-200 bg-white py-7 shadow-sm">
-        <div className="px-6 sm:px-8 md:px-6 xl:px-10">
-          <div className="flex items-center justify-between">
-            <Link href="/">
-              <Image
-                src="/assets/logo-text.jpg"
-                width={1000}
-                height={1000}
-                alt="Logo"
-                className="w-24 md:w-32"
-              />
-            </Link>
-            <button
-              className="text-2xl text-gray-400 transition-colors hover:text-red-500"
-              onClick={() => router.push("/register")}
-            >
-              <IoCloseSharp />
-            </button>
+    <section className="flex min-h-screen w-full items-center justify-center bg-slate-50 p-4">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl transition-all">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-slate-100 p-6">
+          <Link href="/">
+            <Image
+              src="/IDATA_LOGO.png"
+              width={120}
+              height={40}
+              alt="Logo"
+              className="h-auto w-24 md:w-28"
+            />
+          </Link>
+          <button
+            className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+            onClick={() => router.push("/register")}
+          >
+            <IoCloseSharp size={24} />
+          </button>
+        </div>
+
+        <div className="p-8">
+          <div className="mb-6">
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 md:text-3xl">
+              Verify your Email
+            </h1>
+            <p className="mt-2 text-sm text-slate-500">
+              We've sent a 6-digit verification code to:
+            </p>
+            {email && (
+              <div className="mt-2 flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700">
+                <Mail size={14} />
+                {email}
+              </div>
+            )}
           </div>
 
-          <div className="h-fit w-fit pb-5 pt-9">
-            <h1 className="text-2xl font-bold text-blue-600 md:text-3xl">
-              ផ្ទៀងផ្ទាត់លេខកូដ
-            </h1>
-            <p className="pt-4 text-slate-500">
-              យើងបានផ្ញើលេខកូដទៅកាន់អ៉ីម៉ែលរបស់អ្នក។ <br />{" "}
-              លេខកូដនឹងហួសសុពលភាពក្នុងរយៈពេល:
-              <span className="font-bold text-red-500">{` ${timer}s`}</span>
-            </p>
-
-            <div className="mt-8">
+          <div className="space-y-6">
+            <div className="flex flex-col items-center justify-center space-y-4">
               <OTPValidation length={6} onComplete={handleOTPComplete} />
-
-              <div className="mt-4 text-right">
-                <button
-                  className={`text-sm font-bold ${timer > 0 ? "cursor-not-allowed text-gray-400" : "text-blue-600 hover:underline"}`}
-                  onClick={handleResendCode}
-                  disabled={resending || timer > 0}
-                >
-                  {resending ? "កំពុងផ្ញើរ..." : "ផ្ញើលេខកូដម្ដងទៀត"}
-                </button>
+              
+              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-slate-400">
+                <Timer size={14} className={timer < 10 ? "text-red-500 animate-pulse" : ""} />
+                Expires in: <span className={timer < 10 ? "text-red-500" : "text-slate-600"}>{timer}s</span>
               </div>
             </div>
 
-            <div className="mt-8">
-              <Button
-                type="submit"
-                text="បញ្ជាក់លេខកូដ"
-                onClick={handleSubmit}
-                isLoading={isLoading}
-                className="w-full rounded-lg bg-blue-600 py-3 font-semibold text-white hover:bg-blue-700"
-              />
+            <div className="flex items-center justify-center pt-2">
+              <button
+                className={`flex items-center gap-2 text-sm font-semibold transition-all ${
+                  timer > 0 
+                    ? "cursor-not-allowed text-slate-300" 
+                    : "text-blue-600 hover:text-blue-700 active:scale-95"
+                }`}
+                onClick={handleResendCode}
+                disabled={resending || timer > 0}
+              >
+                <RefreshCcw size={14} className={resending ? "animate-spin" : ""} />
+                {resending ? "Resending..." : "Resend Code"}
+              </button>
             </div>
+
+            <Button
+              type="submit"
+              text="Verify Code"
+              onClick={handleSubmit}
+              isLoading={isLoading}
+              className="mt-4 w-full rounded-xl bg-blue-600 py-4 text-base font-bold text-white shadow-lg shadow-blue-200 transition-all hover:bg-blue-700 active:scale-[0.98]"
+            />
           </div>
+
+          <p className="mt-8 text-center text-xs text-slate-400">
+            Didn't receive the email? Check your spam folder or try resending.
+          </p>
         </div>
       </div>
     </section>

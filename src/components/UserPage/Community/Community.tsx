@@ -22,7 +22,7 @@ import {
   X,
   TrendingUp,
 } from "lucide-react";
-
+import { toast } from "@/hooks/use-toast";
 import {
   useGetCommunityFeedQuery,
   useForkApiSchemeMutation,
@@ -63,7 +63,7 @@ export default function Community() {
   // --- 🎯 States ---
   const [inputValue, setInputValue] = useState("");
   const [queryTerm, setQueryTerm] = useState("");
-  const [page, setPage] = useState(0); // Backend page ចាប់ផ្ដើមពី 0
+  const [page, setPage] = useState(0); 
   const [allApis, setAllApis] = useState<any[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [allCategories, setAllCategories] = useState<string[]>([]);
@@ -94,7 +94,7 @@ export default function Community() {
   const [forkApi, { isLoading: isForking }] = useForkApiSchemeMutation();
 
   // --- 🎯 Infinite Scroll Logic ---
-  // --- 🎯 Infinite Scroll Logic ---
+
   useEffect(() => {
     if (newApis) {
       setAllApis((prev) => {
@@ -107,12 +107,12 @@ export default function Community() {
       if (newApis.length < 10) setHasMore(false);
       else setHasMore(true);
 
-      // 🎯 មកដល់ហើយ! បើកសោរវិញ
+
       isPageLoading.current = false;
     }
   }, [newApis, page]);
 
-  // ពេល Search ត្រូវ Reset សោរ
+
   useEffect(() => {
     setPage(0);
     setHasMore(true);
@@ -123,7 +123,7 @@ export default function Community() {
     (entries: IntersectionObserverEntry[]) => {
       const target = entries[0];
 
-      // 🎯 បន្ថែមការ check ឱ្យកាន់តែច្បាស់
+
       if (
         target.isIntersecting &&
         hasMore &&
@@ -131,7 +131,7 @@ export default function Community() {
         !isLoadingFeed &&
         !isPageLoading.current
       ) {
-        // ចាក់សោរ Ref
+
         isPageLoading.current = true;
 
         setPage((prev) => {
@@ -144,17 +144,17 @@ export default function Community() {
   );
 
   useEffect(() => {
-    // ប្រសិនបើអស់ទិន្នន័យហើយ មិនបាច់បង្កើត Observer មកនាំតែ Loop ទេ
+
     if (!hasMore) return;
 
     const observer = new IntersectionObserver(handleObserver, {
-      threshold: 0.5, // ឃើញពាក់កណ្ដាល Loader ទើបដំឡើង Page
-      rootMargin: "0px", // មិនបាច់ប្រើ Margin ទេសម្រាប់ទិន្នន័យតិច ដើម្បីកុំឱ្យវា Trigger មុនឃើញ
+      threshold: 0.5, 
+      rootMargin: "0px", 
     });
 
     if (observerTarget.current) observer.observe(observerTarget.current);
     return () => observer.disconnect();
-  }, [handleObserver, hasMore]); // 🎯 ថែម hasMore ក្នុង dependency
+  }, [handleObserver, hasMore]); 
 
   // --- 🎯 Filter & Sort Logic ---
   const filteredAndSortedApis = useMemo(() => {
@@ -205,19 +205,36 @@ export default function Community() {
     else setTargetFolderId("");
   }, [folders]);
 
-  const handleConfirmFork = async () => {
-    if (!selectedApi || !targetFolderId) return;
-    try {
-      await forkApi({
-        originalId: selectedApi.id,
-        targetFolderId: Number(targetFolderId),
-      }).unwrap();
-      alert(`ជោគជ័យ! API ត្រូវបាន Fork រួចរាល់។`);
-      setIsForkModalOpen(false);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+const handleConfirmFork = async () => {
+  if (!selectedApi || !targetFolderId) return;
+  
+  try {
+    const response = await forkApi({
+      originalId: selectedApi.id,
+      targetFolderId: Number(targetFolderId),
+    }).unwrap();
+
+    // Success Toast
+    toast({
+      title: "API Forked Successfully!",
+      description: response?.message || `The API has been copied to your target folder.`,
+      variant: "success", // Ensure your shadcn/ui toaster has a success variant
+      duration: 3000,
+    });
+
+    setIsForkModalOpen(false);
+  } catch (error: any) {
+    console.error(error);
+
+    // Error Toast
+    toast({
+      title: "Fork Failed",
+      description: error?.data?.message || "Something went wrong while forking the API.",
+      variant: "destructive", // Default shadcn error variant
+      duration: 4000,
+    });
+  }
+};
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -386,13 +403,12 @@ export default function Community() {
                     </div>
                     <div className="mt-5 flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <HoverCard openDelay={100}>
-                          <HoverCardTrigger asChild>
+                       
                             <div className="group/user flex cursor-pointer items-center gap-3">
                               <div className="relative h-9 w-9 overflow-hidden rounded-full border-2 border-white shadow-md ring-1 ring-gray-100 transition-transform group-hover/user:scale-110">
                                 <Image
                                   unoptimized
-                                  src={api.ownerAvatar || "/default-avatar.png"}
+                                  src={api.ownerAvatar || "/placeholder.png"}
                                   width={40}
                                   height={40}
                                   alt=""
@@ -409,18 +425,10 @@ export default function Community() {
                                 </p>
                               </div>
                             </div>
-                          </HoverCardTrigger>
-                          <HoverCardPortal>
-                            <HoverCardContent
-                              side="top"
-                              align="center"
-                              sideOffset={15}
-                              className="z-[9999] w-[320px] rounded-2xl border-none bg-transparent p-0 shadow-2xl"
-                            >
-                              <UserProfilePreview api={api} />
-                            </HoverCardContent>
-                          </HoverCardPortal>
-                        </HoverCard>
+
+
+                            
+
                       </div>
                       <div className="flex gap-2">
                         <button

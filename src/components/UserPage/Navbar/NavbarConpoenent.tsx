@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, CheckCheck } from "lucide-react";
+import { Menu, X, CheckCheck, Home, Users, BookOpen, Mail, LayoutDashboard } from "lucide-react";
 
 import { UserInfo } from "./user-info";
 import {
@@ -21,15 +21,15 @@ import { BellIcon } from "@/components/DashboardCompoenents/Layouts/header/notif
 
 export default function NavbarComponent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Close mobile menu whenever the path changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   // Fetch user data
   const { data: userResponse, isLoading, error } = useGetUserQuery();
-  useEffect(() => {
-    if (userResponse) {
-      console.log("User Response:", userResponse);
-      console.log("User Payload:", userResponse);
-    }
-  }, [userResponse]);
 
   // Map user for UserInfo component
   const mappedUser = userResponse
@@ -42,13 +42,20 @@ export default function NavbarComponent() {
 
   const isOrganizer = userResponse?.roles?.includes("USER");
 
+  const navLinks = [
+    { name: "Home", href: "/", icon: <Home size={18} /> },
+    { name: "Community", href: "/community", icon: <Users size={18} /> },
+    { name: "Learn", href: "/learn", icon: <BookOpen size={18} /> },
+    { name: "Contact us", href: "/contact", icon: <Mail size={18} /> },
+  ];
+
   return (
-    <div className="sticky top-0 z-40 w-full border-b border-gray-100 bg-white">
-      <header className="mx-auto flex items-center justify-between px-4 py-4 md:px-8">
+    <div className="sticky top-0 z-50 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
+      <header className="mx-auto flex items-center justify-between px-4 py-4 md:px-8 max-w-7xl">
         {/* LEFT: Logo */}
         <div className="flex items-center">
           <Link href={`/`} className="flex items-center">
-            <div className="borber flex w-[100px] items-center rounded-md border-purple-600 p-0.5 text-2xl font-black tracking-tighter">
+            <div className="flex w-[100px] items-center rounded-md p-0.5 text-2xl font-black tracking-tighter">
               <Image
                 src="/logo_1.png"
                 width={130}
@@ -62,121 +69,143 @@ export default function NavbarComponent() {
 
         {/* RIGHT: Desktop Links */}
         <div className="hidden items-center space-x-6 md:flex">
-          <div className="flex items-center space-x-2 text-sm font-medium text-gray-700">
-            <div className="rounded-full px-3 py-2 hover:border-purple-300 hover:bg-purple-100">
-              <Link href="/" className="hover:text-[#9b34eb]">
-                Home
+          <nav className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={`rounded-full px-4 py-2 transition-all hover:bg-purple-100 hover:text-[#9b34eb] ${
+                  pathname === link.href ? "bg-purple-50 text-[#9b34eb]" : ""
+                }`}
+              >
+                {link.name}
               </Link>
-            </div>
-            <div className="rounded-full px-3 py-2 hover:border-purple-300 hover:bg-purple-100">
-              <Link href="/community" className="hover:text-[#9b34eb]">
-                Community
-              </Link>
-            </div>
-            <div className="rounded-full px-3 py-2 hover:border-purple-300 hover:bg-purple-100">
-              <Link href="/about" className="hover:text-[#9b34eb]">
-                About us
-              </Link>
-            </div>
-            <span className="text-gray-300">|</span>
-            <div className="rounded-full px-3 py-2 hover:border-purple-300 hover:bg-purple-100">
-              <Link href="/contact" className="hover:text-[#9b34eb]">
-                Contact us
-              </Link>
-            </div>
-            <span className="text-gray-300">|</span>
+            ))}
+            
+            <span className="text-gray-300 mx-2">|</span>
+            
             {isOrganizer && (
-              <div className="rounded-full px-3 py-2 hover:border-purple-300 hover:bg-purple-100">
-                <Link href="/dashboard" className="hover:text-[#9b34eb]">
-                  My Dashboard
-                </Link>
-              </div>
+              <Link
+                href="/dashboard"
+                className="rounded-full px-4 py-2 hover:bg-purple-100 hover:text-[#9b34eb] transition-all"
+              >
+                My Dashboard
+              </Link>
             )}
 
             {/* Notifications */}
             <Sheet>
               <SheetTrigger asChild>
-                <button className="group relative flex h-12 w-12 items-center justify-center rounded-full bg-[#f5f5ff] transition-all hover:bg-purple-50 active:scale-90">
-                  <BellIcon className="size-6 text-gray-600" />
-                  <span className="absolute right-2.5 top-2.5 flex size-2">
+                <button className="group relative flex h-10 w-10 items-center justify-center rounded-full bg-[#f5f5ff] transition-all hover:bg-purple-50 active:scale-90 mx-2">
+                  <BellIcon className="size-5 text-gray-600" />
+                  <span className="absolute right-2 top-2 flex size-2">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75"></span>
                     <span className="relative inline-flex size-2 rounded-full border border-white bg-red-500"></span>
                   </span>
                 </button>
               </SheetTrigger>
-              <SheetContent className="w-full rounded-l-[30px] border-l-0 p-0 sm:max-w-md">
-                <div className="flex h-full flex-col bg-[#F8F9FA]">
-                  <div className="bg-white px-6 py-6 shadow-sm">
-                    <div className="flex items-center justify-between">
-                      <SheetTitle className="text-xl font-bold">
-                        Notifications
-                      </SheetTitle>
-                    </div>
-                  </div>
-                  <div className="flex-1 space-y-3 overflow-y-auto p-4">
-                    <NotificationItem
-                      title="Ticket Confirmed!"
-                      desc="Your booking for 'Tech Expo 2026' is successful."
-                      time="2 mins ago"
-                      isNew
-                    />
-                    <NotificationItem
-                      title="New Event Alert"
-                      desc="A new concert was added in your favorite category."
-                      time="1 hour ago"
-                    />
-                    <NotificationItem
-                      title="Profile Updated"
-                      desc="You have successfully changed your password."
-                      time="Yesterday"
-                    />
-                  </div>
-                  <div className="border-t bg-white p-4">
-                    <button className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gray-900 py-4 text-sm font-bold text-white transition-all active:scale-95">
-                      <CheckCheck size={18} />
-                      View All Activity
-                    </button>
-                  </div>
-                </div>
-              </SheetContent>
+              
             </Sheet>
 
-            {/* User Info */}
-            <div className="flex items-center space-x-3">
+            {/* User Info / Auth Buttons */}
+            <div className="flex items-center ml-4">
               {isLoading ? (
                 <div className="h-10 w-10 animate-pulse rounded-full bg-gray-100" />
               ) : mappedUser ? (
-                <div className="shrink-0">
-                  <UserInfo user={mappedUser} />
-                </div>
+                <UserInfo user={mappedUser} />
               ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="rounded-lg border border-dashed border-[#9b34eb] bg-[#f5eafd] px-6 py-2 font-semibold text-[#9b34eb]"
-                  >
+                <div className="flex gap-3">
+                  <Link href="/login" className="rounded-lg border border-[#9b34eb]/20 bg-[#f5eafd] px-5 py-2 text-sm font-bold text-[#9b34eb] hover:bg-[#9b34eb]/10 transition-colors">
                     Login
                   </Link>
-                  <Link
-                    href="/register"
-                    className="rounded-lg bg-[#9b34eb] px-6 py-2 font-semibold text-white"
-                  >
+                  <Link href="/register" className="rounded-lg bg-[#9b34eb] px-5 py-2 text-sm font-bold text-white hover:bg-[#862dcb] shadow-md shadow-purple-200 transition-all">
                     Register
                   </Link>
-                </>
+                </div>
               )}
             </div>
-          </div>
+          </nav>
         </div>
 
-        {/* Mobile Toggle */}
-        <button
-          className="md:hidden"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* MOBILE: Toggle Button and Notification Bell */}
+        <div className="flex items-center gap-4 md:hidden">
+           {/* Show notification bell even on mobile header */}
+           <button className="relative p-2 rounded-full bg-gray-50">
+             <BellIcon className="size-6 text-gray-600" />
+             <span className="absolute right-1.5 top-1.5 size-2 rounded-full bg-red-500"></span>
+           </button>
+           
+           <button
+            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
       </header>
+
+      {/* MOBILE MENU OVERLAY */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-50 w-full h-fit flex flex-col bg-white md:hidden animate-in fade-in slide-in-from-top duration-300">
+          <div className="flex items-center justify-between px-6 py-5 border-b">
+             <Image src="/logo_1.png" width={100} height={30} alt="Logo" />
+             <button onClick={() => setMobileMenuOpen(false)} className="p-2 text-gray-500">
+               <X size={28} />
+             </button>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto px-6 py-8">
+            <nav className="flex flex-col gap-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-gray-50 text-gray-700 font-bold hover:bg-purple-50 hover:text-[#9b34eb] transition-all"
+                >
+                  <span className="text-gray-400 group-hover:text-[#9b34eb]">{link.icon}</span>
+                  {link.name}
+                </Link>
+              ))}
+
+              {isOrganizer && (
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-4 p-4 rounded-2xl bg-purple-600 text-white font-bold shadow-lg shadow-purple-100"
+                >
+                  <LayoutDashboard size={18} />
+                  My Dashboard
+                </Link>
+              )}
+            </nav>
+          </div>
+
+          <div className="p-6 border-t bg-gray-50/50">
+            {mappedUser ? (
+              <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                 <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center font-bold text-[#9b34eb]">
+                      {mappedUser.name.charAt(0)}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-gray-900">{mappedUser.name}</p>
+                      <p className="text-xs text-gray-500">{mappedUser.email}</p>
+                    </div>
+                 </div>
+                 {/* You could add a logout button here */}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <Link href="/login" className="text-center py-4 rounded-2xl border border-gray-200 font-bold text-gray-700 bg-white">
+                  Login
+                </Link>
+                <Link href="/register" className="text-center py-4 rounded-2xl bg-[#9b34eb] font-bold text-white shadow-lg shadow-purple-100">
+                  Register
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

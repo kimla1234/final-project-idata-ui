@@ -6,8 +6,7 @@ import {
   TabsTrigger,
 } from "@/components/DashboardCompoenents/ui/tabs";
 import Account from "./Account/Account";
-import Company from "./Conpany/Company";
-import Invoice from "./Invoice/Invoice";
+
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { General } from "./General/General";
@@ -41,20 +40,12 @@ export function Settings({ schema }: { schema: any }) {
       >
         <TabsList className="w-full space-x-1 rounded-md bg-slate-200 py-2">
           <TabsTrigger value="general" className="w-full">
-            General
+            Collaborators
           </TabsTrigger>
           <TabsTrigger value="account" className="w-full">
             Account
           </TabsTrigger>
-          <TabsTrigger value="company" className="w-full">
-            Company
-          </TabsTrigger>
-          <TabsTrigger value="invoice" className="w-full">
-            Business
-          </TabsTrigger>
-          <TabsTrigger value="security" className="w-full">
-            Security
-          </TabsTrigger>
+          
         </TabsList>
 
         <TabsContent
@@ -73,30 +64,8 @@ export function Settings({ schema }: { schema: any }) {
             <Account />
           </div>
         </TabsContent>
-        <TabsContent
-          value="company"
-          className="duration-500 animate-in fade-in slide-in-from-bottom-4"
-        >
-          <div className="h-auto w-full rounded-md bg-white p-7 text-slate-600">
-            <Company />
-          </div>
-        </TabsContent>
-        <TabsContent
-          value="invoice"
-          className="duration-500 animate-in fade-in slide-in-from-bottom-4"
-        >
-          <div className="h-auto w-full rounded-md bg-white p-7 text-slate-600">
-            <Invoice />
-          </div>
-        </TabsContent>
-        <TabsContent
-          value="security"
-          className="duration-500 animate-in fade-in slide-in-from-bottom-4"
-        >
-          <div className="h-auto w-full rounded-md bg-white p-7 text-slate-600">
-            Security
-          </div>
-        </TabsContent>
+        
+        
       </Tabs>
     </div>
   );

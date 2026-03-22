@@ -8,7 +8,7 @@ import { Loader2 } from "lucide-react";
 
 export default function JoinWorkspacePage({ params }: { params: { id: string } }) {
     const workspaceId = params.id;
-    // 🎯 ដំណោះស្រាយ៖ ប្រើ React.use() ដើម្បីចាប់យក ID ពី Promise params
+
     //const resolvedParams = React.use(params); 
 
 
@@ -17,14 +17,14 @@ export default function JoinWorkspacePage({ params }: { params: { id: string } }
     const [joinWorkspace, { isLoading }] = useJoinWorkspaceMutation();
 
     const handleJoin = async () => {
-        // ឆែកមើលក្រែងលោ workspaceId អត់មានតម្លៃ
+
         if (!workspaceId) {
             toast({ title: "Error", description: "Invalid Workspace ID", variant: "destructive" });
             return;
         }
 
         try {
-            // ប្រើ Number() សុវត្ថិភាពជាង parseInt()
+
             await joinWorkspace(Number(workspaceId)).unwrap();
             
             toast({

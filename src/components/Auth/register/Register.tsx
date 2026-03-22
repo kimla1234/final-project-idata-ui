@@ -146,27 +146,7 @@ export const Register = () => {
             </p>
           </div>
 
-          {/* GOOGLE BUTTON */}
-          <button
-            type="button"
-            className="mb-6 flex w-full items-center justify-center rounded-xl border border-gray-300 px-4 py-3 font-medium text-gray-700 transition hover:bg-gray-50 active:scale-95"
-          >
-            <img
-              src="https://logowik.com/content/uploads/images/985_google_g_icon.jpg"
-              alt="Google"
-              className="mr-3 h-5"
-            />
-            Continue with Google
-          </button>
-
-          {/* DIVIDER */}
-          <div className="my-6 flex items-center">
-            <div className="flex-grow border-t border-gray-200"></div>
-            <span className="mx-4 text-xs font-bold text-gray-400">
-              OR
-            </span>
-            <div className="flex-grow border-t border-gray-200"></div>
-          </div>
+         
 
           <Formik
             initialValues={initialValues}

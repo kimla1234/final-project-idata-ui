@@ -30,7 +30,7 @@ import { useRouter } from "next/navigation";
 interface CreateSchemaProps {
   folderId: number | null;
   children?: React.ReactNode;
-  workspaceId: number; // 🎯 បងត្រូវបោះ workspaceId មកពី Dashboard
+  workspaceId: number; 
 }
 
 export default function CreateSchema({
@@ -87,13 +87,13 @@ export default function CreateSchema({
 
     try {
 
-      // 🎯 បាញ់ទៅ API តាម Structure: { workspaceId, body: { name } }
+      //  Structure: { workspaceId, body: { name } }
       const res = await createFolder({
         workspaceId: workspaceId,
         body: { name: newFolderName },
       }).unwrap();
 
-      // បន្ទាប់ពីបង្កើតជោគជ័យ វានឹង Select យក Folder ថ្មីនោះអូតូ
+      
       setFormData({ ...formData, folderId: res.id });
       setIsNewFolderMode(false);
       setNewFolderName("");
@@ -213,7 +213,7 @@ export default function CreateSchema({
   return (
     <Sheet>
       <SheetTrigger asChild>
-        {/* 🎯 ត្រូវប្រើ <div> ឬ <span> ក្ដោបដើម្បីឱ្យវាទៅជា Single Element */}
+
         <div className="inline-block w-full cursor-pointer">
           {children ? (
             children

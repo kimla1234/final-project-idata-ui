@@ -65,7 +65,7 @@ export const communityApi = normPlovApi.injectEndpoints({
         method: "POST",
         params: { targetFolderId }, // បញ្ជូនតាម Query Parameter
       }),
-      invalidatesTags: ["ApiSchemes"],
+      invalidatesTags: ["ApiSchemes" , "CommunityFeed"],
     }),
   }),
   overrideExisting: true,
