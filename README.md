@@ -1,4 +1,4 @@
-# 🚀 E-Invoice System
+# 🚀 Idata 
 
 **iData** is an open-source mockup API with enormous datasets integration for even beginner developers. For a better understanding of our topic, Let us first understand the concept of an API.
 
